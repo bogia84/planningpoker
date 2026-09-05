@@ -1,0 +1,29 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "planning-poker-realtime",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-04-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "ROOM_DO",
+        "class_name": "RoomDurableObject"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["RoomDurableObject"]
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "planning-poker-db",
+      // Fill in after running: wrangler d1 create planning-poker-db
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "planningpoker",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace apps/web",
+    "dev:realtime": "npm run dev --workspace apps/realtime",
+    "build:web": "npm run build --workspace apps/web",
+    "build:realtime": "npm run build --workspace apps/realtime",
+    "deploy:web": "npm run deploy --workspace apps/web",
+    "deploy:realtime": "npm run deploy --workspace apps/realtime"
+  }
+}

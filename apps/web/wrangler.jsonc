@@ -1,0 +1,19 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "planning-poker-web",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-04-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "planning-poker-db",
+      // Fill in after running: wrangler d1 create planning-poker-db
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID"
+    }
+  ]
+}
