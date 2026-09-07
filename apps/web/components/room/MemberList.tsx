@@ -63,7 +63,7 @@ export function MemberList({
             <div className="relative">
               {revealedPoint !== undefined ? (
                 <span
-                  className="pixel-card absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full bg-(--pp-primary) px-2 py-0.5 text-xs font-bold text-white"
+                  className="pixel-card absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full min-w-[1.75rem] whitespace-nowrap bg-(--pp-primary) px-2 py-1 text-center text-lg font-bold leading-none text-white"
                   title="Revealed point"
                 >
                   {revealedPoint}
