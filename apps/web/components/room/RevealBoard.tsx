@@ -39,12 +39,19 @@ export function RevealBoard({
           return (
             <li key={r.memberId} className="pixel-card flex w-40 flex-col items-center gap-2 p-3">
               <PixelAvatar avatarId={member?.avatarId ?? "mint"} size={32} />
-              <span className="text-xs">{member?.name ?? "Unknown"}</span>
-              <span className="text-2xl font-bold">{r.point}</span>
-              <div className="grid w-full grid-cols-3 gap-1 text-center text-[10px] opacity-70">
-                <span>R {r.risk}</span>
-                <span>C {r.complexity}</span>
-                <span>P {r.repetition}</span>
+              <span className="text-sm font-bold">{member?.name ?? "Unknown"}</span>
+              <div className="group relative">
+                <span
+                  className="cursor-help text-2xl font-bold underline decoration-dotted decoration-2 underline-offset-4"
+                  tabIndex={0}
+                >
+                  {r.point}
+                </span>
+                <div className="pixel-panel pointer-events-none invisible absolute bottom-full left-1/2 z-10 mb-2 w-36 -translate-x-1/2 flex-col gap-2 p-3 opacity-0 transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 flex">
+                  <Gauge label="Risk" value={r.risk} />
+                  <Gauge label="Complexity" value={r.complexity} />
+                  <Gauge label="Repetition" value={r.repetition} />
+                </div>
               </div>
             </li>
           );
@@ -73,6 +80,21 @@ export function RevealBoard({
           </button>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function Gauge({ label, value }: { label: string; value: number }) {
+  const pct = Math.max(0, Math.min(100, (value / 10) * 100));
+  return (
+    <div className="flex flex-col gap-0.5 text-left">
+      <div className="flex items-center justify-between text-[10px] font-bold">
+        <span>{label}</span>
+        <span>{value}/10</span>
+      </div>
+      <div className="h-2 w-full overflow-hidden rounded-sm border border-(--pp-ink) bg-(--pp-bg)">
+        <div className="h-full bg-(--pp-primary)" style={{ width: `${pct}%` }} />
+      </div>
     </div>
   );
 }

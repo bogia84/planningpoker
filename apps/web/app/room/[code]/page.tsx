@@ -118,7 +118,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-8">
+    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-8">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="pixel-heading text-lg text-[--pp-primary]">ROOM {roomCode}</h1>
@@ -148,21 +148,6 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
       ) : (
         <>
           <section className="pixel-panel p-4">
-            <h2 className="pixel-heading mb-3 text-xs">TEAM</h2>
-            <MemberList
-              members={state.members}
-              phase={state.round?.phase}
-              submittedFactorIds={state.round?.submittedFactorMemberIds}
-              submittedPointIds={state.round?.submittedPointMemberIds}
-              results={state.round?.results}
-              nudgeMemberIds={nudgeMemberIds.filter(
-                (id) => !state.round?.submittedPointMemberIds.includes(id),
-              )}
-              nudgeTexts={nudgeTexts}
-            />
-          </section>
-
-          <section className="pixel-panel p-4">
             <h2 className="pixel-heading mb-3 text-xs">STORY QUEUE</h2>
             <StoryQueue
               stories={state.stories}
@@ -173,67 +158,86 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
             />
           </section>
 
-          {activeStory && state.round ? (
-            <section className="flex flex-col gap-4">
-              <h2 className="pixel-heading text-sm">
-                ESTIMATING: {activeStory.title} (round {state.round.roundNumber})
-              </h2>
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+            <section className="pixel-panel p-4 lg:w-[22rem] lg:shrink-0">
+              <h2 className="pixel-heading mb-3 text-xs">TEAM</h2>
+              <MemberList
+                members={state.members}
+                phase={state.round?.phase}
+                submittedFactorIds={state.round?.submittedFactorMemberIds}
+                submittedPointIds={state.round?.submittedPointMemberIds}
+                results={state.round?.results}
+                nudgeMemberIds={nudgeMemberIds.filter(
+                  (id) => !state.round?.submittedPointMemberIds.includes(id),
+                )}
+                nudgeTexts={nudgeTexts}
+              />
+            </section>
 
-              {state.round.phase === "revealed" && state.round.results ? (
-                <RevealBoard
-                  results={state.round.results}
-                  members={state.members}
-                  isHost={isHost}
-                  scaleValues={state.config.scaleValues}
-                  onRevote={() => send({ type: "host_start_revote", storyId: activeStory.id })}
-                  onFinalize={(finalPoint) =>
-                    send({ type: "host_finalize_story", storyId: activeStory.id, finalPoint })
-                  }
-                />
-              ) : (
-                <>
-                  <FactorSliders
-                    submitted={Boolean(selfId && state.round.submittedFactorMemberIds.includes(selfId))}
-                    onSubmit={(scores) =>
-                      send({ type: "submit_factor_scores", storyId: activeStory.id, ...scores })
+            {activeStory && state.round ? (
+              <section className="flex flex-1 flex-col gap-4">
+                <h2 className="pixel-heading text-sm">
+                  ESTIMATING: {activeStory.title} (round {state.round.roundNumber})
+                </h2>
+
+                {state.round.phase === "revealed" && state.round.results ? (
+                  <RevealBoard
+                    results={state.round.results}
+                    members={state.members}
+                    isHost={isHost}
+                    scaleValues={state.config.scaleValues}
+                    onRevote={() => send({ type: "host_start_revote", storyId: activeStory.id })}
+                    onFinalize={(finalPoint) =>
+                      send({ type: "host_finalize_story", storyId: activeStory.id, finalPoint })
                     }
                   />
-
-                  {selfId && state.round.submittedFactorMemberIds.includes(selfId) ? (
-                    <PointCardDeck
-                      scaleValues={state.config.scaleValues}
-                      onSelect={(value) => send({ type: "submit_point", storyId: activeStory.id, value })}
+                ) : (
+                  <>
+                    <FactorSliders
+                      submitted={Boolean(selfId && state.round.submittedFactorMemberIds.includes(selfId))}
+                      onSubmit={(scores) =>
+                        send({ type: "submit_factor_scores", storyId: activeStory.id, ...scores })
+                      }
                     />
-                  ) : null}
 
-                  {isHost ? (
-                    <div className="flex flex-wrap items-center gap-2">
-                      <button type="button" className="pixel-btn self-start" onClick={handleRevealClick}>
-                        REVEAL CARDS
-                      </button>
-                      {nudgeMemberIds.filter((id) => !state.round!.submittedPointMemberIds.includes(id))
-                        .length > 0 ? (
-                        <>
-                          <span className="text-xs opacity-60">Still waiting on some votes.</span>
-                          <button
-                            type="button"
-                            className="pixel-btn danger self-start text-xs"
-                            onClick={() => send({ type: "host_reveal", storyId: activeStory.id })}
-                          >
-                            REVEAL ANYWAY
-                          </button>
-                        </>
-                      ) : null}
-                    </div>
-                  ) : null}
-                </>
-              )}
-            </section>
-          ) : (
-            <p className="pixel-card p-4 text-sm">
-              {isHost ? "Start a story from the queue above." : "Waiting for the host to start a story."}
-            </p>
-          )}
+                    {selfId && state.round.submittedFactorMemberIds.includes(selfId) ? (
+                      <PointCardDeck
+                        scaleValues={state.config.scaleValues}
+                        onSelect={(value) => send({ type: "submit_point", storyId: activeStory.id, value })}
+                      />
+                    ) : null}
+
+                    {isHost ? (
+                      <div className="flex flex-wrap items-center gap-2">
+                        <button type="button" className="pixel-btn self-start" onClick={handleRevealClick}>
+                          REVEAL CARDS
+                        </button>
+                        {nudgeMemberIds.filter((id) => !state.round!.submittedPointMemberIds.includes(id))
+                          .length > 0 ? (
+                          <>
+                            <span className="text-xs opacity-60">Still waiting on some votes.</span>
+                            <button
+                              type="button"
+                              className="pixel-btn danger self-start text-xs"
+                              onClick={() => send({ type: "host_reveal", storyId: activeStory.id })}
+                            >
+                              REVEAL ANYWAY
+                            </button>
+                          </>
+                        ) : null}
+                      </div>
+                    ) : null}
+                  </>
+                )}
+              </section>
+            ) : (
+              <section className="flex flex-1">
+                <p className="pixel-card p-4 text-sm">
+                  {isHost ? "Start a story from the queue above." : "Waiting for the host to start a story."}
+                </p>
+              </section>
+            )}
+          </div>
 
           {state.history.length > 0 ? (
             <section className="pixel-panel p-4">

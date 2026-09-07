@@ -29,8 +29,7 @@ export function MemberList({
       <div className="pixel-card absolute inset-x-[22%] inset-y-[30%] flex flex-col items-center justify-center gap-1.5 bg-[#B5732A]/25">
         <span className="pixel-heading text-center text-[9px] opacity-50 sm:text-[11px]">ROUND OF THE KNIGHT</span>
         <div className="pixel-card flex h-12 w-9 flex-col items-center justify-center gap-0.5 bg-(--pp-panel)">
-          <span className="pixel-heading text-sm leading-none">K</span>
-          <span className="text-base leading-none">👑</span>
+          <span className="text-xl leading-none">👑</span>
         </div>
       </div>
 
@@ -98,7 +97,7 @@ export function MemberList({
               ) : null}
               <PixelAvatar avatarId={m.avatarId} size={36} />
             </div>
-            <span className="pixel-card max-w-[5.5rem] truncate bg-(--pp-panel) px-1 py-0.5 text-[10px]">
+            <span className="pixel-card max-w-[7rem] truncate bg-(--pp-panel) px-1.5 py-0.5 text-sm font-bold">
               {m.name}
             </span>
             {m.isHost ? (
