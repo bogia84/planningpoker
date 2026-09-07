@@ -21,7 +21,19 @@ const NUDGE_LINES = [
   "STOP STALLING, PICK A CARD!",
   "SPRINT WON'T START WITHOUT YOU!",
   "TICK TOCK, DROP A CARD!",
+  "OI, PICK A CARD!",
+  "THE KING IS WAITING!",
+  "DAYDREAMING? VOTE!",
+  "NO CARD, NO GLORY!",
+  "PICK ONE, ANY ONE!",
+  "YOUR TEAM IS JUDGING YOU!",
 ];
+
+// Deals a different (non-repeating until exhausted) taunt to each member id.
+function dealNudgeTexts(memberIds: string[]): Record<string, string> {
+  const shuffled = [...NUDGE_LINES].sort(() => Math.random() - 0.5);
+  return Object.fromEntries(memberIds.map((id, i) => [id, shuffled[i % shuffled.length]]));
+}
 
 export default function RoomPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = use(params);
@@ -53,7 +65,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   );
 
   const [nudgeMemberIds, setNudgeMemberIds] = useState<string[]>([]);
-  const [nudgeText, setNudgeText] = useState("");
+  const [nudgeTexts, setNudgeTexts] = useState<Record<string, string>>({});
 
   useEffect(() => {
     // A new round (fresh start or re-vote) clears any leftover nudge from the last one.
@@ -67,7 +79,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
       .map((m) => m.id);
     if (missing.length > 0) {
       setNudgeMemberIds(missing);
-      setNudgeText(NUDGE_LINES[Math.floor(Math.random() * NUDGE_LINES.length)]);
+      setNudgeTexts(dealNudgeTexts(missing));
       return;
     }
     setNudgeMemberIds([]);
@@ -146,7 +158,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
               nudgeMemberIds={nudgeMemberIds.filter(
                 (id) => !state.round?.submittedPointMemberIds.includes(id),
               )}
-              nudgeText={nudgeText}
+              nudgeTexts={nudgeTexts}
             />
           </section>
 

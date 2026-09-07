@@ -10,7 +10,7 @@ export function MemberList({
   submittedPointIds,
   results,
   nudgeMemberIds,
-  nudgeText,
+  nudgeTexts,
 }: {
   members: Member[];
   phase?: RoundPhase;
@@ -19,14 +19,19 @@ export function MemberList({
   results?: RevealedResult[] | null;
   /** Members the host just tried to reveal past — they get punched until they vote. */
   nudgeMemberIds?: string[];
-  nudgeText?: string;
+  /** Per-member taunt line, keyed by member id, so everyone gets a different jab. */
+  nudgeTexts?: Record<string, string>;
 }) {
   const seatCount = Math.max(members.length, 1);
 
   return (
     <div className="relative mx-auto aspect-4/3 w-full max-w-xl">
-      <div className="pixel-card absolute inset-x-[22%] inset-y-[30%] flex items-center justify-center bg-[#B5732A]/25">
-        <span className="pixel-heading text-[10px] opacity-40 sm:text-xs">TABLE</span>
+      <div className="pixel-card absolute inset-x-[22%] inset-y-[30%] flex flex-col items-center justify-center gap-1.5 bg-[#B5732A]/25">
+        <span className="pixel-heading text-center text-[9px] opacity-50 sm:text-[11px]">ROUND OF THE KNIGHT</span>
+        <div className="pixel-card flex h-12 w-9 flex-col items-center justify-center gap-0.5 bg-(--pp-panel)">
+          <span className="pixel-heading text-sm leading-none">K</span>
+          <span className="text-base leading-none">👑</span>
+        </div>
       </div>
 
       {members.map((m, i) => {
@@ -43,6 +48,7 @@ export function MemberList({
         const roundOpen = phase === "factors" || phase === "voting";
         const isThinking = roundOpen && !pointDone && m.connected;
         const isNudged = isThinking && Boolean(nudgeMemberIds?.includes(m.id));
+        const nudgeText = nudgeTexts?.[m.id] ?? "VOTE ALREADY!";
         const revealedPoint =
           phase === "revealed" ? results?.find((r) => r.memberId === m.id)?.point : undefined;
 
@@ -57,7 +63,7 @@ export function MemberList({
             <div className="relative">
               {revealedPoint !== undefined ? (
                 <span
-                  className="pixel-card absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-full bg-(--pp-primary) px-2 py-0.5 text-xs font-bold text-white"
+                  className="pixel-card absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full bg-(--pp-primary) px-2 py-0.5 text-xs font-bold text-white"
                   title="Revealed point"
                 >
                   {revealedPoint}
@@ -65,7 +71,7 @@ export function MemberList({
               ) : null}
               {isThinking && !isNudged ? (
                 <span
-                  className="absolute -top-4 left-1/2 -translate-x-1/2 -translate-y-full animate-bounce text-lg leading-none"
+                  className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full animate-bounce text-lg leading-none"
                   title="Still deciding"
                   aria-label="Thinking"
                 >
@@ -73,7 +79,7 @@ export function MemberList({
                 </span>
               ) : null}
               {isNudged ? (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 -translate-y-full flex flex-col items-center gap-0.5">
+                <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full flex flex-col items-center gap-0.5">
                   <span className="pixel-card whitespace-nowrap bg-(--pp-danger) px-1.5 py-0.5 text-[9px] font-bold text-white">
                     {nudgeText}
                   </span>
