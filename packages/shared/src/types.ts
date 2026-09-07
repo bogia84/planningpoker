@@ -2,10 +2,14 @@ export type ScaleType = "tshirt" | "fibonacci" | "modified_fibonacci" | "custom"
 
 export type EstimationStage = "rough" | "sprint";
 
+// Fun break cards included by default on every preset scale: coffee (cafe break),
+// pizza (food break), and banana (going bananas / too big to size).
+export const SPECIAL_CARDS = ["☕", "🍕", "🍌"];
+
 export const SCALE_PRESETS: Record<Exclude<ScaleType, "custom">, string[]> = {
-  tshirt: ["XS", "S", "M", "L", "XL", "XXL"],
-  fibonacci: ["0", "1", "2", "3", "5", "8", "13", "21", "34"],
-  modified_fibonacci: ["0", "0.5", "1", "2", "3", "5", "8", "13", "20", "40", "100"],
+  tshirt: ["XS", "S", "M", "L", "XL", "XXL", ...SPECIAL_CARDS],
+  fibonacci: ["0", "1", "2", "3", "5", "8", "13", "21", "34", ...SPECIAL_CARDS],
+  modified_fibonacci: ["0", "0.5", "1", "2", "3", "5", "8", "13", "20", "40", "100", ...SPECIAL_CARDS],
 };
 
 export interface RoomConfig {

@@ -1,6 +1,6 @@
 "use client";
 
-import { AVATAR_PALETTES } from "@/lib/avatars";
+import { AVATAR_CHARACTERS } from "@/lib/avatars";
 import { PixelAvatar } from "./PixelAvatar";
 
 export function AvatarPicker({
@@ -12,19 +12,19 @@ export function AvatarPicker({
 }) {
   return (
     <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
-      {AVATAR_PALETTES.map((palette) => (
+      {AVATAR_CHARACTERS.map((character) => (
         <button
-          key={palette.id}
+          key={character.id}
           type="button"
-          onClick={() => onChange(palette.id)}
-          title={palette.label}
+          onClick={() => onChange(character.id)}
+          title={character.label}
           className={`rounded-md border-4 p-1 transition ${
-            value === palette.id
+            value === character.id
               ? "border-(--pp-ink) scale-105"
               : "border-transparent hover:border-(--pp-ink)/30"
           }`}
         >
-          <PixelAvatar avatarId={palette.id} size={40} />
+          <PixelAvatar avatarId={character.id} size={40} />
         </button>
       ))}
     </div>

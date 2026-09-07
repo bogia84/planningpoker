@@ -108,6 +108,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
             <h2 className="pixel-heading mb-3 text-xs">TEAM</h2>
             <MemberList
               members={state.members}
+              phase={state.round?.phase}
               submittedFactorIds={state.round?.submittedFactorMemberIds}
               submittedPointIds={state.round?.submittedPointMemberIds}
             />
