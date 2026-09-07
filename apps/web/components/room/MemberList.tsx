@@ -79,7 +79,7 @@ export function MemberList({
               ) : null}
               {isNudged ? (
                 <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full flex flex-col items-center gap-0.5">
-                  <span className="pixel-card whitespace-nowrap bg-(--pp-danger) px-1.5 py-0.5 text-[9px] font-bold text-white">
+                  <span className="pixel-card whitespace-nowrap bg-(--pp-danger) px-2 py-1 text-xs font-bold text-white">
                     {nudgeText}
                   </span>
                   <span className="animate-bounce text-lg leading-none" aria-label="Nudge to vote">
