@@ -9,12 +9,17 @@ export function MemberList({
   submittedFactorIds,
   submittedPointIds,
   results,
+  nudgeMemberIds,
+  nudgeText,
 }: {
   members: Member[];
   phase?: RoundPhase;
   submittedFactorIds?: string[];
   submittedPointIds?: string[];
   results?: RevealedResult[] | null;
+  /** Members the host just tried to reveal past — they get punched until they vote. */
+  nudgeMemberIds?: string[];
+  nudgeText?: string;
 }) {
   const seatCount = Math.max(members.length, 1);
 
@@ -37,6 +42,7 @@ export function MemberList({
         // independent per member, so every not-yet-voted member gets the indicator at once.
         const roundOpen = phase === "factors" || phase === "voting";
         const isThinking = roundOpen && !pointDone && m.connected;
+        const isNudged = isThinking && Boolean(nudgeMemberIds?.includes(m.id));
         const revealedPoint =
           phase === "revealed" ? results?.find((r) => r.memberId === m.id)?.point : undefined;
 
@@ -57,23 +63,24 @@ export function MemberList({
                   {revealedPoint}
                 </span>
               ) : null}
-              {isThinking ? (
-                <>
-                  <span
-                    className="absolute -top-4 left-0 -translate-x-1/3 -translate-y-full animate-bounce text-lg leading-none"
-                    title="Still deciding"
-                    aria-label="Thinking"
-                  >
-                    💭
+              {isThinking && !isNudged ? (
+                <span
+                  className="absolute -top-4 left-1/2 -translate-x-1/2 -translate-y-full animate-bounce text-lg leading-none"
+                  title="Still deciding"
+                  aria-label="Thinking"
+                >
+                  💭
+                </span>
+              ) : null}
+              {isNudged ? (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 -translate-y-full flex flex-col items-center gap-0.5">
+                  <span className="pixel-card whitespace-nowrap bg-(--pp-danger) px-1.5 py-0.5 text-[9px] font-bold text-white">
+                    {nudgeText}
                   </span>
-                  <span
-                    className="absolute -top-3 right-0 translate-x-1/3 -translate-y-full animate-bounce text-lg leading-none [animation-delay:150ms]"
-                    title="Come on, vote already!"
-                    aria-label="Nudge to vote"
-                  >
+                  <span className="animate-bounce text-lg leading-none" aria-label="Nudge to vote">
                     <span className="inline-block rotate-[-35deg]">👊</span>
                   </span>
-                </>
+                </div>
               ) : null}
               {roundOpen && pointDone ? (
                 <span

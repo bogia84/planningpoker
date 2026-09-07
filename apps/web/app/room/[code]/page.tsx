@@ -14,6 +14,15 @@ import { BASE_PATH } from "@/lib/basePath";
 import { loadHostToken, loadIdentity, saveIdentity } from "@/lib/identity";
 import { useRoomConnection, type JoinInfo } from "@/lib/useRoomConnection";
 
+const NUDGE_LINES = [
+  "VOTE OR GET PUNCHED!",
+  "WAKE UP AND VOTE!",
+  "EVERYONE'S WAITING, HERO!",
+  "STOP STALLING, PICK A CARD!",
+  "SPRINT WON'T START WITHOUT YOU!",
+  "TICK TOCK, DROP A CARD!",
+];
+
 export default function RoomPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = use(params);
   const roomCode = code.toUpperCase();
@@ -42,6 +51,28 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
     () => state?.stories.find((s) => s.id === state.activeStoryId) ?? null,
     [state],
   );
+
+  const [nudgeMemberIds, setNudgeMemberIds] = useState<string[]>([]);
+  const [nudgeText, setNudgeText] = useState("");
+
+  useEffect(() => {
+    // A new round (fresh start or re-vote) clears any leftover nudge from the last one.
+    setNudgeMemberIds([]);
+  }, [activeStory?.id, state?.round?.roundNumber]);
+
+  function handleRevealClick() {
+    if (!activeStory || !state?.round) return;
+    const missing = state.members
+      .filter((m) => m.connected && !state.round!.submittedPointMemberIds.includes(m.id))
+      .map((m) => m.id);
+    if (missing.length > 0) {
+      setNudgeMemberIds(missing);
+      setNudgeText(NUDGE_LINES[Math.floor(Math.random() * NUDGE_LINES.length)]);
+      return;
+    }
+    setNudgeMemberIds([]);
+    send({ type: "host_reveal", storyId: activeStory.id });
+  }
 
   function handleJoinSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -112,6 +143,10 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
               submittedFactorIds={state.round?.submittedFactorMemberIds}
               submittedPointIds={state.round?.submittedPointMemberIds}
               results={state.round?.results}
+              nudgeMemberIds={nudgeMemberIds.filter(
+                (id) => !state.round?.submittedPointMemberIds.includes(id),
+              )}
+              nudgeText={nudgeText}
             />
           </section>
 
@@ -160,13 +195,24 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
                   ) : null}
 
                   {isHost ? (
-                    <button
-                      type="button"
-                      className="pixel-btn self-start"
-                      onClick={() => send({ type: "host_reveal", storyId: activeStory.id })}
-                    >
-                      REVEAL CARDS
-                    </button>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button type="button" className="pixel-btn self-start" onClick={handleRevealClick}>
+                        REVEAL CARDS
+                      </button>
+                      {nudgeMemberIds.filter((id) => !state.round!.submittedPointMemberIds.includes(id))
+                        .length > 0 ? (
+                        <>
+                          <span className="text-xs opacity-60">Still waiting on some votes.</span>
+                          <button
+                            type="button"
+                            className="pixel-btn danger self-start text-xs"
+                            onClick={() => send({ type: "host_reveal", storyId: activeStory.id })}
+                          >
+                            REVEAL ANYWAY
+                          </button>
+                        </>
+                      ) : null}
+                    </div>
                   ) : null}
                 </>
               )}
