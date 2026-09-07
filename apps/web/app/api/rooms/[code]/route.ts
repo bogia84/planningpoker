@@ -1,22 +1,20 @@
 import { NextResponse } from "next/server";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { getRoom } from "@/lib/roomStore";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
   const { env } = getCloudflareContext();
 
-  const room = await env.DB.prepare("SELECT id, scale_type, scale_values, stage FROM rooms WHERE id = ?")
-    .bind(code.toUpperCase())
-    .first<{ id: string; scale_type: string; scale_values: string; stage: string }>();
-
+  const room = await getRoom(env.ROOMS_BUCKET, code.toUpperCase());
   if (!room) {
     return NextResponse.json({ error: "Room not found" }, { status: 404 });
   }
 
   return NextResponse.json({
-    roomCode: room.id,
-    scaleType: room.scale_type,
-    scaleValues: JSON.parse(room.scale_values) as string[],
-    stage: room.stage,
+    roomCode: room.record.roomCode,
+    scaleType: room.record.config.scaleType,
+    scaleValues: room.record.config.scaleValues,
+    stage: room.record.config.stage,
   });
 }

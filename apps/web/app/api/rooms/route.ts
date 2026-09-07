@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { SCALE_PRESETS, type EstimationStage, type ScaleType } from "@planningpoker/shared";
 import { generateRoomCode } from "@/lib/roomCode";
+import { createRoom, type RoomRecord } from "@/lib/roomStore";
 
 interface CreateRoomBody {
   scaleType: ScaleType;
@@ -28,33 +29,38 @@ export async function POST(request: Request) {
 
   const { env } = getCloudflareContext();
   const hostToken = crypto.randomUUID();
+  const now = Date.now();
+
+  const stories = (body.stories ?? []).map((story, index) => ({
+    id: crypto.randomUUID(),
+    title: story.title,
+    description: story.description,
+    sortOrder: index,
+    status: "pending" as const,
+  }));
 
   let roomCode = "";
-  let attempts = 0;
-  while (attempts < 5) {
+  for (let attempts = 0; attempts < 5 && !roomCode; attempts++) {
     const candidate = generateRoomCode();
-    try {
-      await env.DB.prepare(
-        "INSERT INTO rooms (id, host_token, scale_type, scale_values, stage) VALUES (?, ?, ?, ?, ?)",
-      )
-        .bind(candidate, hostToken, body.scaleType, JSON.stringify(scaleValues), body.stage)
-        .run();
+    const record: RoomRecord = {
+      roomCode: candidate,
+      hostToken,
+      config: { scaleType: body.scaleType, scaleValues, stage: body.stage },
+      stories,
+      members: [],
+      activeStoryId: null,
+      round: null,
+      history: [],
+      createdAt: now,
+      updatedAt: now,
+    };
+    if (await createRoom(env.ROOMS_BUCKET, record)) {
       roomCode = candidate;
-      break;
-    } catch (err) {
-      attempts += 1;
-      if (attempts >= 5) throw err;
     }
   }
 
-  const stories = body.stories ?? [];
-  if (stories.length > 0) {
-    const statements = stories.map((story, index) =>
-      env.DB.prepare(
-        "INSERT INTO stories (id, room_id, title, description, sort_order, status) VALUES (?, ?, ?, ?, ?, 'pending')",
-      ).bind(crypto.randomUUID(), roomCode, story.title, story.description ?? null, index),
-    );
-    await env.DB.batch(statements);
+  if (!roomCode) {
+    return NextResponse.json({ error: "Could not allocate a room code, please retry" }, { status: 500 });
   }
 
   return NextResponse.json({ roomCode, hostToken });

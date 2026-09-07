@@ -48,6 +48,20 @@ export interface RevealedResult {
   repetition: number;
 }
 
+export interface SessionHistoryEntry {
+  id: string;
+  storyId: string;
+  storyTitle: string;
+  stage: EstimationStage;
+  finalPoint: string;
+  avgRisk: number;
+  avgComplexity: number;
+  avgRepetition: number;
+  roundCount: number;
+  memberVotes: RevealedResult[];
+  finalizedAt: number;
+}
+
 export interface RoomStateSnapshot {
   roomCode: string;
   config: RoomConfig;
@@ -61,19 +75,6 @@ export interface RoomStateSnapshot {
     submittedPointMemberIds: string[];
     results: RevealedResult[] | null;
   } | null;
+  history: SessionHistoryEntry[];
   selfMemberId: string;
-}
-
-export interface StoryHistoryEntry {
-  id: string;
-  storyId: string;
-  roomId: string;
-  storyTitle: string;
-  stage: EstimationStage;
-  finalPoint: string;
-  avgRisk: number;
-  avgComplexity: number;
-  avgRepetition: number;
-  roundCount: number;
-  finalizedAt: number;
 }

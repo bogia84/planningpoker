@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { ClientMessage, RoomStateSnapshot, ServerMessage } from "@planningpoker/shared";
-import { roomWsUrl } from "./wsUrl";
+import type { ClientMessage, RoomStateSnapshot } from "@planningpoker/shared";
+import { BASE_PATH } from "./basePath";
 
 export type ConnectionStatus = "connecting" | "open" | "closed";
 
@@ -13,205 +13,114 @@ export interface JoinInfo {
   hostToken?: string;
 }
 
+const POLL_INTERVAL_MS = 1500;
+const POLL_INTERVAL_HIDDEN_MS = 6000;
+const JOIN_RETRY_MS = 3000;
+
 export function useRoomConnection(roomCode: string, joinInfo: JoinInfo | null) {
   const [state, setState] = useState<RoomStateSnapshot | null>(null);
   const [status, setStatus] = useState<ConnectionStatus>("connecting");
   const [lastError, setLastError] = useState<string | null>(null);
-  const wsRef = useRef<WebSocket | null>(null);
-  const joinInfoRef = useRef(joinInfo);
-  useEffect(() => {
-    joinInfoRef.current = joinInfo;
-  }, [joinInfo]);
+  const memberIdRef = useRef<string | null>(null);
 
-  const send = useCallback((message: ClientMessage) => {
-    const ws = wsRef.current;
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify(message));
-    }
-  }, []);
+  const send = useCallback(
+    (message: ClientMessage) => {
+      if (message.type === "join") return;
+      const memberId = memberIdRef.current;
+      if (!memberId) return;
+      fetch(`${BASE_PATH}/api/rooms/${roomCode}/action`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ memberId, action: message }),
+      })
+        .then(async (res) => {
+          const body = (await res.json()) as { state?: RoomStateSnapshot; message?: string };
+          if (!res.ok) {
+            setLastError(body.message ?? "Action failed");
+            return;
+          }
+          if (body.state) setState(body.state);
+        })
+        .catch(() => setLastError("Network error — please retry"));
+    },
+    [roomCode],
+  );
 
   useEffect(() => {
     if (!joinInfo) return;
 
     let cancelled = false;
-    let closedByUs = false;
-    let retryAttempt = 0;
-    let socket: WebSocket | null = null;
-    let retryTimeout: ReturnType<typeof setTimeout> | null = null;
+    let pollTimer: ReturnType<typeof setTimeout> | null = null;
 
-    function applyServerMessage(message: ServerMessage) {
-      switch (message.type) {
-        case "room_state":
-          setState(message.state);
-          break;
-        case "member_joined":
-          setState((prev) => {
-            if (!prev) return prev;
-            const exists = prev.members.some((m) => m.id === message.member.id);
-            const members = exists
-              ? prev.members.map((m) => (m.id === message.member.id ? message.member : m))
-              : [...prev.members, message.member];
-            return { ...prev, members };
-          });
-          break;
-        case "member_left":
-          setState((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  members: prev.members.map((m) =>
-                    m.id === message.memberId ? { ...m, connected: false } : m,
-                  ),
-                }
-              : prev,
-          );
-          break;
-        case "member_updated":
-          setState((prev) =>
-            prev
-              ? { ...prev, members: prev.members.map((m) => (m.id === message.member.id ? message.member : m)) }
-              : prev,
-          );
-          break;
-        case "story_list_updated":
-          setState((prev) => (prev ? { ...prev, stories: message.stories } : prev));
-          break;
-        case "story_started":
-          setState((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  activeStoryId: message.storyId,
-                  round: {
-                    roundNumber: 1,
-                    phase: message.phase,
-                    submittedFactorMemberIds: [],
-                    submittedPointMemberIds: [],
-                    results: null,
-                  },
-                }
-              : prev,
-          );
-          break;
-        case "submission_progress":
-          setState((prev) =>
-            prev && prev.round
-              ? {
-                  ...prev,
-                  round: {
-                    ...prev.round,
-                    roundNumber: message.roundNumber,
-                    submittedFactorMemberIds: message.submittedFactorMemberIds,
-                    submittedPointMemberIds: message.submittedPointMemberIds,
-                  },
-                }
-              : prev,
-          );
-          break;
-        case "revealed":
-          setState((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  round: {
-                    roundNumber: message.roundNumber,
-                    phase: "revealed",
-                    submittedFactorMemberIds: prev.round?.submittedFactorMemberIds ?? [],
-                    submittedPointMemberIds: prev.round?.submittedPointMemberIds ?? [],
-                    results: message.results,
-                  },
-                }
-              : prev,
-          );
-          break;
-        case "revote_started":
-          setState((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  round: {
-                    roundNumber: message.roundNumber,
-                    phase: "factors",
-                    submittedFactorMemberIds: [],
-                    submittedPointMemberIds: [],
-                    results: null,
-                  },
-                }
-              : prev,
-          );
-          break;
-        case "story_finalized":
-          setState((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  activeStoryId: prev.activeStoryId === message.storyId ? null : prev.activeStoryId,
-                  round: prev.activeStoryId === message.storyId ? null : prev.round,
-                  stories: prev.stories.map((s) =>
-                    s.id === message.storyId ? { ...s, status: "finalized" } : s,
-                  ),
-                }
-              : prev,
-          );
-          break;
-        case "error":
-          setLastError(message.message);
-          break;
+    function scheduleNextPoll() {
+      const delay = document.visibilityState === "hidden" ? POLL_INTERVAL_HIDDEN_MS : POLL_INTERVAL_MS;
+      pollTimer = setTimeout(poll, delay);
+    }
+
+    async function poll() {
+      if (cancelled) return;
+      const memberId = memberIdRef.current;
+      if (!memberId) return;
+      try {
+        const res = await fetch(
+          `${BASE_PATH}/api/rooms/${roomCode}/state?memberId=${encodeURIComponent(memberId)}`,
+        );
+        if (!res.ok) throw new Error("poll failed");
+        const body = (await res.json()) as { state: RoomStateSnapshot };
+        if (cancelled) return;
+        setState(body.state);
+        setStatus("open");
+      } catch {
+        if (!cancelled) setStatus("closed");
+      } finally {
+        if (!cancelled) scheduleNextPoll();
       }
     }
 
-    function connect() {
+    async function join() {
       if (cancelled) return;
       setStatus("connecting");
-      socket = new WebSocket(roomWsUrl(roomCode));
-      wsRef.current = socket;
-
-      socket.addEventListener("open", () => {
-        retryAttempt = 0;
-        setStatus("open");
-        const info = joinInfoRef.current;
-        if (!info) return;
-        send({
-          type: "join",
-          name: info.name,
-          avatarId: info.avatarId,
-          memberId: info.memberId,
-          hostToken: info.hostToken,
+      try {
+        const res = await fetch(`${BASE_PATH}/api/rooms/${roomCode}/join`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(joinInfo),
         });
-      });
-
-      socket.addEventListener("message", (event) => {
-        try {
-          applyServerMessage(JSON.parse(event.data));
-        } catch {
-          // ignore malformed frames
-        }
-      });
-
-      socket.addEventListener("close", () => {
+        if (!res.ok) throw new Error("join failed");
+        const body = (await res.json()) as { state: RoomStateSnapshot };
+        if (cancelled) return;
+        memberIdRef.current = body.state.selfMemberId;
+        setState(body.state);
+        setStatus("open");
+        scheduleNextPoll();
+      } catch {
+        if (cancelled) return;
         setStatus("closed");
-        if (closedByUs || cancelled) return;
-        const delay = Math.min(1000 * 2 ** retryAttempt, 10000);
-        retryAttempt += 1;
-        retryTimeout = setTimeout(connect, delay);
-      });
-
-      socket.addEventListener("error", () => {
-        socket?.close();
-      });
+        pollTimer = setTimeout(join, JOIN_RETRY_MS);
+      }
     }
 
-    connect();
+    function handleUnload() {
+      const memberId = memberIdRef.current;
+      if (!memberId || typeof navigator.sendBeacon !== "function") return;
+      const payload = JSON.stringify({ memberId, action: { type: "leave" } });
+      navigator.sendBeacon(
+        `${BASE_PATH}/api/rooms/${roomCode}/action`,
+        new Blob([payload], { type: "application/json" }),
+      );
+    }
+
+    join();
+    window.addEventListener("pagehide", handleUnload);
 
     return () => {
       cancelled = true;
-      closedByUs = true;
-      if (retryTimeout) clearTimeout(retryTimeout);
-      socket?.close();
+      if (pollTimer) clearTimeout(pollTimer);
+      window.removeEventListener("pagehide", handleUnload);
     };
     // Reconnect only when the room or the joining identity actually changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roomCode, joinInfo?.memberId, joinInfo?.name, joinInfo?.avatarId, joinInfo?.hostToken, send]);
+  }, [roomCode, joinInfo?.memberId, joinInfo?.name, joinInfo?.avatarId, joinInfo?.hostToken]);
 
   return { state, status, send, lastError };
 }

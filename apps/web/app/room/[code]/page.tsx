@@ -3,12 +3,14 @@
 import { use, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AvatarPicker } from "@/components/avatar/AvatarPicker";
+import { HistoryTable } from "@/components/history/HistoryTable";
 import { MemberList } from "@/components/room/MemberList";
 import { StoryQueue } from "@/components/room/StoryQueue";
 import { FactorSliders } from "@/components/room/FactorSliders";
 import { PointCardDeck } from "@/components/room/PointCardDeck";
 import { RevealBoard } from "@/components/room/RevealBoard";
 import { DEFAULT_AVATAR_ID } from "@/lib/avatars";
+import { BASE_PATH } from "@/lib/basePath";
 import { loadHostToken, loadIdentity, saveIdentity } from "@/lib/identity";
 import { useRoomConnection, type JoinInfo } from "@/lib/useRoomConnection";
 
@@ -172,6 +174,21 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
               {isHost ? "Start a story from the queue above." : "Waiting for the host to start a story."}
             </p>
           )}
+
+          {state.history.length > 0 ? (
+            <section className="pixel-panel p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <h2 className="pixel-heading text-xs">SESSION HISTORY</h2>
+                <a
+                  href={`${BASE_PATH}/api/rooms/${roomCode}/export`}
+                  className="pixel-btn ghost text-xs"
+                >
+                  DOWNLOAD CSV
+                </a>
+              </div>
+              <HistoryTable entries={state.history} />
+            </section>
+          ) : null}
         </>
       )}
     </main>

@@ -49,10 +49,6 @@ export default function HomePage() {
           </button>
         </form>
       </div>
-
-      <Link href="/history" className="text-sm underline opacity-70 hover:opacity-100">
-        View estimation history
-      </Link>
     </main>
   );
 }

@@ -1,6 +1,6 @@
-import type { StoryHistoryEntry } from "@planningpoker/shared";
+import type { SessionHistoryEntry } from "@planningpoker/shared";
 
-export function HistoryTable({ entries }: { entries: StoryHistoryEntry[] }) {
+export function HistoryTable({ entries }: { entries: SessionHistoryEntry[] }) {
   if (entries.length === 0) {
     return <p className="text-sm opacity-60">No finalized stories yet.</p>;
   }

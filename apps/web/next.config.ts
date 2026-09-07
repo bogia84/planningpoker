@@ -1,16 +1,11 @@
 import type { NextConfig } from "next";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+import { BASE_PATH } from "./lib/basePath";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  basePath: BASE_PATH,
 };
 
-// Point the local dev D1 emulation at the same persisted state the realtime
-// worker's `wrangler dev` uses (apps/realtime/.wrangler/state/v3), since both
-// workers bind the same D1 database in production and need to see the same
-// data locally too.
-initOpenNextCloudflareForDev({
-  persist: { path: "../realtime/.wrangler/state/v3" },
-});
+initOpenNextCloudflareForDev();
 
 export default nextConfig;

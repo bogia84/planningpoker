@@ -1,14 +1,6 @@
-import type {
-  EstimationStage,
-  Member,
-  RevealedResult,
-  RoomConfig,
-  RoomStateSnapshot,
-  ScaleType,
-  Story,
-} from "./types";
+import type { EstimationStage, ScaleType } from "./types";
 
-// ---------- Client -> Server ----------
+// Room actions — sent from the client to the /api/rooms/[code]/action endpoint.
 
 export interface JoinMessage {
   type: "join";
@@ -108,84 +100,4 @@ export type ClientMessage =
   | HostFinalizeStoryMessage
   | LeaveMessage;
 
-// ---------- Server -> Client ----------
-
-export interface RoomStateServerMessage {
-  type: "room_state";
-  state: RoomStateSnapshot;
-}
-
-export interface MemberJoinedMessage {
-  type: "member_joined";
-  member: Member;
-}
-
-export interface MemberLeftMessage {
-  type: "member_left";
-  memberId: string;
-}
-
-export interface MemberUpdatedMessage {
-  type: "member_updated";
-  member: Member;
-}
-
-export interface StoryListUpdatedMessage {
-  type: "story_list_updated";
-  stories: Story[];
-}
-
-export interface StoryStartedMessage {
-  type: "story_started";
-  storyId: string;
-  phase: "factors" | "voting";
-}
-
-export interface SubmissionProgressMessage {
-  type: "submission_progress";
-  storyId: string;
-  roundNumber: number;
-  submittedFactorMemberIds: string[];
-  submittedPointMemberIds: string[];
-}
-
-export interface RevealedMessage {
-  type: "revealed";
-  storyId: string;
-  roundNumber: number;
-  results: RevealedResult[];
-}
-
-export interface RevoteStartedMessage {
-  type: "revote_started";
-  storyId: string;
-  roundNumber: number;
-}
-
-export interface StoryFinalizedMessage {
-  type: "story_finalized";
-  storyId: string;
-  finalPoint: string;
-  historyId: string;
-}
-
-export interface ErrorMessage {
-  type: "error";
-  code: string;
-  message: string;
-}
-
-export type ServerMessage =
-  | RoomStateServerMessage
-  | MemberJoinedMessage
-  | MemberLeftMessage
-  | MemberUpdatedMessage
-  | StoryListUpdatedMessage
-  | StoryStartedMessage
-  | SubmissionProgressMessage
-  | RevealedMessage
-  | RevoteStartedMessage
-  | StoryFinalizedMessage
-  | ErrorMessage;
-
-export type { RoomConfig };
+export type RoomAction = Exclude<ClientMessage, JoinMessage>;

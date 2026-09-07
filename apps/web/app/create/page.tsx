@@ -7,6 +7,7 @@ import { AvatarPicker } from "@/components/avatar/AvatarPicker";
 import { ScaleConfigForm } from "@/components/setup/ScaleConfigForm";
 import { StoryListEditor, type DraftStory } from "@/components/setup/StoryListEditor";
 import { DEFAULT_AVATAR_ID } from "@/lib/avatars";
+import { BASE_PATH } from "@/lib/basePath";
 import { saveHostToken, saveIdentity } from "@/lib/identity";
 
 export default function CreateRoomPage() {
@@ -27,7 +28,7 @@ export default function CreateRoomPage() {
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch("/api/rooms", {
+      const res = await fetch(`${BASE_PATH}/api/rooms`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -42,7 +43,7 @@ export default function CreateRoomPage() {
       });
 
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
+        const body = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(body.error ?? "Failed to create room");
       }
 
