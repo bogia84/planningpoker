@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import type { Member, RevealedResult } from "@planningpoker/shared";
-import { PixelAvatar } from "@/components/avatar/PixelAvatar";
 
 export function RevealBoard({
   results,
@@ -33,21 +32,23 @@ export function RevealBoard({
         {consensus ? "Consensus reached!" : "No consensus yet — discuss and consider a re-vote."}
       </div>
 
-      <ul className="flex flex-wrap gap-3">
+      <ul className="flex flex-col gap-2">
         {results.map((r) => {
           const member = members.find((m) => m.id === r.memberId);
           return (
-            <li key={r.memberId} className="pixel-card flex w-40 flex-col items-center gap-2 p-3">
-              <PixelAvatar avatarId={member?.avatarId ?? "mint"} size={32} />
-              <span className="text-sm font-bold">{member?.name ?? "Unknown"}</span>
-              <div className="group relative">
+            <li
+              key={r.memberId}
+              className="pixel-card flex items-center justify-between gap-3 px-3 py-2"
+            >
+              <span className="truncate text-sm font-bold">{member?.name ?? "Unknown"}</span>
+              <div className="group relative shrink-0">
                 <span
-                  className="cursor-help text-2xl font-bold underline decoration-dotted decoration-2 underline-offset-4"
+                  className="cursor-help text-xl font-bold underline decoration-dotted decoration-2 underline-offset-4"
                   tabIndex={0}
                 >
                   {r.point}
                 </span>
-                <div className="pixel-panel pointer-events-none invisible absolute bottom-full left-1/2 z-10 mb-2 w-36 -translate-x-1/2 flex-col gap-2 p-3 opacity-0 transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 flex">
+                <div className="pixel-panel pointer-events-none invisible absolute bottom-full right-0 z-10 mb-2 w-36 flex-col gap-2 p-3 opacity-0 transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 flex">
                   <Gauge label="Risk" value={r.risk} />
                   <Gauge label="Complexity" value={r.complexity} />
                   <Gauge label="Repetition" value={r.repetition} />

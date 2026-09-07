@@ -25,7 +25,7 @@ export function MemberList({
   const seatCount = Math.max(members.length, 1);
 
   return (
-    <div className="relative mx-auto aspect-4/3 w-full max-w-xl">
+    <div className="relative mx-auto aspect-4/3 w-full max-w-3xl">
       <div className="pixel-card absolute inset-x-[22%] inset-y-[30%] flex flex-col items-center justify-center gap-1.5 bg-[#B5732A]/25">
         <span className="pixel-heading text-center text-[9px] opacity-50 sm:text-[11px]">ROUND OF THE KNIGHT</span>
         <div className="pixel-card flex h-12 w-9 flex-col items-center justify-center gap-0.5 bg-(--pp-panel)">

@@ -118,7 +118,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-8">
+    <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-8">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="pixel-heading text-lg text-[--pp-primary]">ROOM {roomCode}</h1>
@@ -159,7 +159,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
           </section>
 
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
-            <section className="pixel-panel p-4 lg:w-[22rem] lg:shrink-0">
+            <section className="pixel-panel min-w-0 flex-1 p-4">
               <h2 className="pixel-heading mb-3 text-xs">TEAM</h2>
               <MemberList
                 members={state.members}
@@ -175,7 +175,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
             </section>
 
             {activeStory && state.round ? (
-              <section className="flex flex-1 flex-col gap-4">
+              <section className="flex flex-col gap-4 lg:w-96 lg:shrink-0">
                 <h2 className="pixel-heading text-sm">
                   ESTIMATING: {activeStory.title} (round {state.round.roundNumber})
                 </h2>
@@ -231,7 +231,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
                 )}
               </section>
             ) : (
-              <section className="flex flex-1">
+              <section className="flex lg:w-96 lg:shrink-0">
                 <p className="pixel-card p-4 text-sm">
                   {isHost ? "Start a story from the queue above." : "Waiting for the host to start a story."}
                 </p>
