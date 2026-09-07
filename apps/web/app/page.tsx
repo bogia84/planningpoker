@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { APP_VERSION } from "@/lib/version";
 
 export default function HomePage() {
   const router = useRouter();
@@ -22,6 +23,7 @@ export default function HomePage() {
           <br />
           POKER
         </h1>
+        <p className="mt-2 text-xs uppercase tracking-widest opacity-50">v{APP_VERSION}</p>
         <p className="mt-4 text-lg">Estimate user stories with your Scrum team. 8-bit style.</p>
       </div>
 
