@@ -1,6 +1,6 @@
 "use client";
 
-import type { Member, RoundPhase } from "@planningpoker/shared";
+import type { Member, RevealedResult, RoundPhase } from "@planningpoker/shared";
 import { PixelAvatar } from "@/components/avatar/PixelAvatar";
 
 export function MemberList({
@@ -8,11 +8,13 @@ export function MemberList({
   phase,
   submittedFactorIds,
   submittedPointIds,
+  results,
 }: {
   members: Member[];
   phase?: RoundPhase;
   submittedFactorIds?: string[];
   submittedPointIds?: string[];
+  results?: RevealedResult[] | null;
 }) {
   const seatCount = Math.max(members.length, 1);
 
@@ -31,9 +33,12 @@ export function MemberList({
         const pointDone = submittedPointIds?.includes(m.id);
         // The round stays in the "factors" phase for everyone until the host reveals —
         // there's no separate server-side "voting" phase, so waiting-for-vote is just
-        // "round is open and this member hasn't submitted a point card yet".
+        // "round is open and this member hasn't submitted a point card yet". This is
+        // independent per member, so every not-yet-voted member gets the indicator at once.
         const roundOpen = phase === "factors" || phase === "voting";
         const isThinking = roundOpen && !pointDone && m.connected;
+        const revealedPoint =
+          phase === "revealed" ? results?.find((r) => r.memberId === m.id)?.point : undefined;
 
         return (
           <div
@@ -44,14 +49,31 @@ export function MemberList({
             style={{ left: `${left}%`, top: `${top}%` }}
           >
             <div className="relative">
-              {isThinking ? (
+              {revealedPoint !== undefined ? (
                 <span
-                  className="absolute -top-4 left-1/2 -translate-x-1/2 -translate-y-full animate-bounce text-lg leading-none"
-                  title="Waiting for their vote"
-                  aria-label="Thinking"
+                  className="pixel-card absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-full bg-(--pp-primary) px-2 py-0.5 text-xs font-bold text-white"
+                  title="Revealed point"
                 >
-                  💭
+                  {revealedPoint}
                 </span>
+              ) : null}
+              {isThinking ? (
+                <>
+                  <span
+                    className="absolute -top-4 left-0 -translate-x-1/3 -translate-y-full animate-bounce text-lg leading-none"
+                    title="Still deciding"
+                    aria-label="Thinking"
+                  >
+                    💭
+                  </span>
+                  <span
+                    className="absolute -top-3 right-0 translate-x-1/3 -translate-y-full animate-bounce text-lg leading-none [animation-delay:150ms]"
+                    title="Come on, vote already!"
+                    aria-label="Nudge to vote"
+                  >
+                    <span className="inline-block rotate-[-35deg]">👊</span>
+                  </span>
+                </>
               ) : null}
               {roundOpen && pointDone ? (
                 <span

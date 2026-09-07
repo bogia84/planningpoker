@@ -111,6 +111,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
               phase={state.round?.phase}
               submittedFactorIds={state.round?.submittedFactorMemberIds}
               submittedPointIds={state.round?.submittedPointMemberIds}
+              results={state.round?.results}
             />
           </section>
 
