@@ -44,7 +44,7 @@ export function FactorSliders({
           <p className="text-xs opacity-60">{hint}</p>
         </div>
       ))}
-      <button type="button" className="pixel-btn self-start" onClick={() => onSubmit(scores)}>
+      <button type="button" className="pixel-btn secondary self-start" onClick={() => onSubmit(scores)}>
         SUBMIT SCORES
       </button>
     </div>

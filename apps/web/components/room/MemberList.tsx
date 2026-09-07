@@ -25,8 +25,8 @@ export function MemberList({
   const seatCount = Math.max(members.length, 1);
 
   return (
-    <div className="relative mx-auto aspect-4/3 w-full max-w-3xl">
-      <div className="pixel-card absolute inset-x-[22%] inset-y-[30%] flex flex-col items-center justify-center gap-1.5 bg-[#B5732A]/25">
+    <div className="relative mx-auto aspect-3/2 w-full max-w-3xl">
+      <div className="pixel-card absolute inset-x-[18%] inset-y-[24%] flex flex-col items-center justify-center gap-1.5 bg-[#B5732A]/25">
         <span className="pixel-heading text-center text-[9px] opacity-50 sm:text-[11px]">ROUND OF THE KNIGHT</span>
         <div className="pixel-card flex h-12 w-9 flex-col items-center justify-center gap-0.5 bg-(--pp-panel)">
           <span className="text-xl leading-none">👑</span>
@@ -35,8 +35,8 @@ export function MemberList({
 
       {members.map((m, i) => {
         const angle = (i / seatCount) * 2 * Math.PI - Math.PI / 2;
-        const left = 50 + 42 * Math.cos(angle);
-        const top = 50 + 40 * Math.sin(angle);
+        const left = 50 + 40 * Math.cos(angle);
+        const top = 50 + 36 * Math.sin(angle);
 
         const factorsDone = submittedFactorIds?.includes(m.id);
         const pointDone = submittedPointIds?.includes(m.id);
@@ -101,7 +101,9 @@ export function MemberList({
               {m.name}
             </span>
             {m.isHost ? (
-              <span className="rounded bg-(--pp-warning) px-1 text-[9px] font-bold text-(--pp-ink)">HOST</span>
+              <span className="rounded bg-(--pp-warning) px-1.5 py-0.5 text-xs font-bold text-(--pp-ink)">
+                HOST
+              </span>
             ) : null}
             {phase === "factors" && !factorsDone && m.connected ? (
               <span className="text-[9px] opacity-50">scoring…</span>
