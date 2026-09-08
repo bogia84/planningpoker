@@ -2,6 +2,7 @@
 
 import { use, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import type { FactorScores } from "@planningpoker/shared";
 import { AvatarPicker } from "@/components/avatar/AvatarPicker";
 import { HistoryTable } from "@/components/history/HistoryTable";
 import { MemberList } from "@/components/room/MemberList";
@@ -70,6 +71,15 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   useEffect(() => {
     // A new round (fresh start or re-vote) clears any leftover nudge from the last one.
     setNudgeMemberIds([]);
+  }, [activeStory?.id, state?.round?.roundNumber]);
+
+  const [voteScores, setVoteScores] = useState<FactorScores>({ risk: 5, complexity: 5, repetition: 5 });
+  const [votePoint, setVotePoint] = useState<string | null>(null);
+
+  useEffect(() => {
+    // A new round starts every vote fresh, rather than carrying over the last pick.
+    setVoteScores({ risk: 5, complexity: 5, repetition: 5 });
+    setVotePoint(null);
   }, [activeStory?.id, state?.round?.roundNumber]);
 
   function handleRevealClick() {
@@ -193,17 +203,31 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
                   />
                 ) : (
                   <>
-                    <FactorSliders
-                      submitted={Boolean(selfId && state.round.submittedFactorMemberIds.includes(selfId))}
-                      onSubmit={(scores) =>
-                        send({ type: "submit_factor_scores", storyId: activeStory.id, ...scores })
-                      }
-                    />
-
-                    <PointCardDeck
-                      scaleValues={state.config.scaleValues}
-                      onSelect={(value) => send({ type: "submit_point", storyId: activeStory.id, value })}
-                    />
+                    {selfId &&
+                    state.round.submittedFactorMemberIds.includes(selfId) &&
+                    state.round.submittedPointMemberIds.includes(selfId) ? (
+                      <div className="pixel-card p-4 text-sm">Vote submitted — waiting for others.</div>
+                    ) : (
+                      <div className="pixel-panel flex flex-col gap-4 p-4">
+                        <FactorSliders scores={voteScores} onChange={setVoteScores} />
+                        <PointCardDeck
+                          scaleValues={state.config.scaleValues}
+                          selected={votePoint}
+                          onSelect={setVotePoint}
+                        />
+                        <button
+                          type="button"
+                          className="pixel-btn secondary self-start"
+                          disabled={!votePoint}
+                          onClick={() => {
+                            send({ type: "submit_factor_scores", storyId: activeStory.id, ...voteScores });
+                            send({ type: "submit_point", storyId: activeStory.id, value: votePoint! });
+                          }}
+                        >
+                          SUBMIT VOTE
+                        </button>
+                      </div>
+                    )}
 
                     {isHost ? (
                       <div className="flex flex-wrap items-center gap-2">

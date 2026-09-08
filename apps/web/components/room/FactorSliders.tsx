@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import type { FactorScores } from "@planningpoker/shared";
 
 const FACTORS: { key: keyof FactorScores; label: string; hint: string }[] = [
@@ -10,20 +9,14 @@ const FACTORS: { key: keyof FactorScores; label: string; hint: string }[] = [
 ];
 
 export function FactorSliders({
-  submitted,
-  onSubmit,
+  scores,
+  onChange,
 }: {
-  submitted: boolean;
-  onSubmit: (scores: FactorScores) => void;
+  scores: FactorScores;
+  onChange: (scores: FactorScores) => void;
 }) {
-  const [scores, setScores] = useState<FactorScores>({ risk: 5, complexity: 5, repetition: 5 });
-
-  if (submitted) {
-    return <div className="pixel-card p-4 text-sm">Factor scores submitted.</div>;
-  }
-
   return (
-    <div className="pixel-panel flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4">
       {FACTORS.map(({ key, label, hint }) => (
         <div key={key} className="flex flex-col gap-1">
           <div className="flex items-baseline justify-between">
@@ -35,14 +28,11 @@ export function FactorSliders({
             min={1}
             max={10}
             value={scores[key]}
-            onChange={(e) => setScores((prev) => ({ ...prev, [key]: Number(e.target.value) }))}
+            onChange={(e) => onChange({ ...scores, [key]: Number(e.target.value) })}
           />
           <p className="text-xs opacity-60">{hint}</p>
         </div>
       ))}
-      <button type="button" className="pixel-btn secondary self-start" onClick={() => onSubmit(scores)}>
-        SUBMIT SCORES
-      </button>
     </div>
   );
 }
