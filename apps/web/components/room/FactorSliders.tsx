@@ -19,11 +19,7 @@ export function FactorSliders({
   const [scores, setScores] = useState<FactorScores>({ risk: 5, complexity: 5, repetition: 5 });
 
   if (submitted) {
-    return (
-      <div className="pixel-card p-4 text-sm">
-        Factor scores submitted — waiting to pick your point card.
-      </div>
-    );
+    return <div className="pixel-card p-4 text-sm">Factor scores submitted.</div>;
   }
 
   return (

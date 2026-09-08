@@ -200,12 +200,10 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
                       }
                     />
 
-                    {selfId && state.round.submittedFactorMemberIds.includes(selfId) ? (
-                      <PointCardDeck
-                        scaleValues={state.config.scaleValues}
-                        onSelect={(value) => send({ type: "submit_point", storyId: activeStory.id, value })}
-                      />
-                    ) : null}
+                    <PointCardDeck
+                      scaleValues={state.config.scaleValues}
+                      onSelect={(value) => send({ type: "submit_point", storyId: activeStory.id, value })}
+                    />
 
                     {isHost ? (
                       <div className="flex flex-wrap items-center gap-2">
