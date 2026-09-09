@@ -1,0 +1,3 @@
+# Copy to .dev.vars (gitignored) for local `wrangler dev` / `next dev` runs.
+# In production, set this with: wrangler secret put ADMIN_SECRET
+ADMIN_SECRET=changeme

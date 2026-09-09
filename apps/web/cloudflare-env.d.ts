@@ -6,4 +6,5 @@
 // doesn't globally override DOM's Request/Response/fetch types used by client code.
 interface CloudflareEnv {
   ROOMS_BUCKET: import("@cloudflare/workers-types").R2Bucket;
+  ADMIN_SECRET: string;
 }
