@@ -12,7 +12,7 @@ import { PointCardDeck } from "@/components/room/PointCardDeck";
 import { RevealBoard } from "@/components/room/RevealBoard";
 import { DEFAULT_AVATAR_ID } from "@/lib/avatars";
 import { BASE_PATH } from "@/lib/basePath";
-import { loadHostToken, loadIdentity, saveIdentity } from "@/lib/identity";
+import { clearIdentity, loadHostToken, loadIdentity, saveIdentity } from "@/lib/identity";
 import { useRoomConnection, type JoinInfo } from "@/lib/useRoomConnection";
 
 const NUDGE_LINES = [
@@ -44,6 +44,8 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   const [joinInfo, setJoinInfo] = useState<JoinInfo | null>(null);
   const [nameDraft, setNameDraft] = useState("");
   const [avatarDraft, setAvatarDraft] = useState(DEFAULT_AVATAR_ID);
+  const [removedNotice, setRemovedNotice] = useState(false);
+  const [everSeenSelf, setEverSeenSelf] = useState(false);
 
   useEffect(() => {
     // localStorage is only available client-side, so this must run post-mount
@@ -60,6 +62,22 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   const selfId = state?.selfMemberId;
   const selfMember = useMemo(() => state?.members.find((m) => m.id === selfId), [state, selfId]);
   const isHost = Boolean(selfMember?.isHost);
+
+  useEffect(() => {
+    if (!state) return;
+    if (selfMember) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setEverSeenSelf(true);
+      return;
+    }
+    // The server no longer lists us as a member after previously confirming we were
+    // one — the host must have removed us. Boot back to the join screen.
+    if (everSeenSelf) {
+      clearIdentity(roomCode);
+      setRemovedNotice(true);
+      setJoinInfo(null);
+    }
+  }, [state, selfMember, everSeenSelf, roomCode]);
   const activeStory = useMemo(
     () => state?.stories.find((s) => s.id === state.activeStoryId) ?? null,
     [state],
@@ -102,6 +120,8 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
     if (!trimmed) return;
     const identity = { memberId: crypto.randomUUID(), name: trimmed, avatarId: avatarDraft };
     saveIdentity(roomCode, identity);
+    setRemovedNotice(false);
+    setEverSeenSelf(false);
     setJoinInfo({ ...identity, hostToken: loadHostToken(roomCode) ?? undefined });
   }
 
@@ -109,6 +129,11 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
     return (
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-4 px-4 py-10">
         <h1 className="pixel-heading text-lg text-[--pp-primary]">JOIN ROOM {roomCode}</h1>
+        {removedNotice ? (
+          <p className="pixel-card bg-(--pp-danger) p-2 text-sm text-white">
+            You were removed from this room by the host.
+          </p>
+        ) : null}
         <form onSubmit={handleJoinSubmit} className="pixel-panel flex flex-col gap-4 p-5">
           <input
             className="pixel-input"
@@ -157,17 +182,6 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
         <p className="text-sm opacity-60">Loading room...</p>
       ) : (
         <>
-          <section className="pixel-panel p-4">
-            <h2 className="pixel-heading mb-3 text-xs">STORY QUEUE</h2>
-            <StoryQueue
-              stories={state.stories}
-              isHost={isHost}
-              activeStoryId={state.activeStoryId}
-              onAddStory={(title) => send({ type: "host_add_story", title })}
-              onStartStory={(storyId) => send({ type: "host_start_story", storyId })}
-            />
-          </section>
-
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
             <section className="pixel-panel min-w-0 flex-1 p-4">
               <h2 className="pixel-heading mb-3 text-xs">TEAM</h2>
@@ -181,6 +195,10 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
                   (id) => !state.round?.submittedPointMemberIds.includes(id),
                 )}
                 nudgeTexts={nudgeTexts}
+                selfMemberId={selfId}
+                viewerIsHost={isHost}
+                onTransferHost={(targetMemberId) => send({ type: "transfer_host", targetMemberId })}
+                onRemoveMember={(targetMemberId) => send({ type: "remove_member", targetMemberId })}
               />
             </section>
 
@@ -255,11 +273,23 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
             ) : (
               <section className="flex lg:w-96 lg:shrink-0">
                 <p className="pixel-card p-4 text-sm">
-                  {isHost ? "Start a story from the queue above." : "Waiting for the host to start a story."}
+                  {isHost ? "Start a story from the queue below." : "Waiting for the host to start a story."}
                 </p>
               </section>
             )}
           </div>
+
+          <section className="pixel-panel p-4">
+            <h2 className="pixel-heading mb-3 text-xs">STORY QUEUE</h2>
+            <StoryQueue
+              stories={state.stories}
+              isHost={isHost}
+              activeStoryId={state.activeStoryId}
+              onAddStory={(title) => send({ type: "add_story", title })}
+              onRemoveStory={(storyId) => send({ type: "remove_story", storyId })}
+              onStartStory={(storyId) => send({ type: "host_start_story", storyId })}
+            />
+          </section>
 
           {state.history.length > 0 ? (
             <section className="pixel-panel p-4">

@@ -26,6 +26,7 @@ export interface Story {
   description?: string;
   sortOrder: number;
   status: StoryStatus;
+  finalPoint?: string;
 }
 
 export interface Member {

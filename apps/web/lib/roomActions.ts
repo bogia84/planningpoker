@@ -91,8 +91,7 @@ export function applyAction(record: RoomRecord, memberId: string, message: RoomA
       return { ...record, config };
     }
 
-    case "host_add_story": {
-      requireHost();
+    case "add_story": {
       const story: Story = {
         id: crypto.randomUUID(),
         title: message.title,
@@ -113,9 +112,12 @@ export function applyAction(record: RoomRecord, memberId: string, message: RoomA
       return { ...record, stories };
     }
 
-    case "host_remove_story": {
-      requireHost();
-      return { ...record, stories: record.stories.filter((s) => s.id !== message.storyId) };
+    case "remove_story": {
+      const stories = record.stories.filter((s) => s.id !== message.storyId);
+      if (record.activeStoryId === message.storyId) {
+        return { ...record, stories, activeStoryId: null, round: null };
+      }
+      return { ...record, stories };
     }
 
     case "host_reorder_stories": {
@@ -223,13 +225,42 @@ export function applyAction(record: RoomRecord, memberId: string, message: RoomA
         finalizedAt: Math.floor(Date.now() / 1000),
       };
 
-      const stories = record.stories.map((s) => (s.id === story.id ? { ...s, status: "finalized" as const } : s));
+      const stories = record.stories.map((s) =>
+        s.id === story.id ? { ...s, status: "finalized" as const, finalPoint: message.finalPoint } : s,
+      );
       return { ...record, stories, activeStoryId: null, round: null, history: [...record.history, entry] };
     }
 
     case "leave": {
       const members = record.members.map((m) => (m.id === memberId ? { ...m, connected: false } : m));
       return { ...record, members };
+    }
+
+    case "transfer_host": {
+      requireHost();
+      const target = record.members.find((m) => m.id === message.targetMemberId);
+      if (!target) throw new ActionError("not_found", "Member not found");
+      if (target.id === memberId) return record;
+      const members = record.members.map((m) =>
+        m.id === memberId ? { ...m, isHost: false } : m.id === target.id ? { ...m, isHost: true } : m,
+      );
+      return { ...record, members };
+    }
+
+    case "remove_member": {
+      requireHost();
+      if (message.targetMemberId === memberId) {
+        throw new ActionError("invalid_action", "Cannot remove yourself");
+      }
+      const target = record.members.find((m) => m.id === message.targetMemberId);
+      if (!target) throw new ActionError("not_found", "Member not found");
+      const members = record.members.filter((m) => m.id !== target.id);
+      if (!record.round) return { ...record, members };
+      const factorScores = { ...record.round.factorScores };
+      const pointVotes = { ...record.round.pointVotes };
+      delete factorScores[target.id];
+      delete pointVotes[target.id];
+      return { ...record, members, round: { ...record.round, factorScores, pointVotes } };
     }
 
     default:

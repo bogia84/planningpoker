@@ -28,6 +28,12 @@ export function saveIdentity(roomCode: string, identity: RoomIdentity) {
   window.localStorage.setItem(identityKey(roomCode), JSON.stringify(identity));
 }
 
+export function clearIdentity(roomCode: string) {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(identityKey(roomCode));
+  window.localStorage.removeItem(hostTokenKey(roomCode));
+}
+
 export function loadHostToken(roomCode: string): string | null {
   if (typeof window === "undefined") return null;
   return window.localStorage.getItem(hostTokenKey(roomCode));

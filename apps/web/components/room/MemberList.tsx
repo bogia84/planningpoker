@@ -11,6 +11,10 @@ export function MemberList({
   results,
   nudgeMemberIds,
   nudgeTexts,
+  selfMemberId,
+  viewerIsHost,
+  onTransferHost,
+  onRemoveMember,
 }: {
   members: Member[];
   phase?: RoundPhase;
@@ -21,6 +25,12 @@ export function MemberList({
   nudgeMemberIds?: string[];
   /** Per-member taunt line, keyed by member id, so everyone gets a different jab. */
   nudgeTexts?: Record<string, string>;
+  /** The viewer's own member id, used to hide host controls on their own seat. */
+  selfMemberId?: string;
+  /** Whether the viewer is the host — gates the transfer-host/remove-member controls. */
+  viewerIsHost?: boolean;
+  onTransferHost?: (memberId: string) => void;
+  onRemoveMember?: (memberId: string) => void;
 }) {
   const seatCount = Math.max(members.length, 1);
 
@@ -107,6 +117,30 @@ export function MemberList({
             ) : null}
             {phase === "factors" && !factorsDone && m.connected ? (
               <span className="text-[9px] opacity-50">scoring…</span>
+            ) : null}
+            {viewerIsHost && m.id !== selfMemberId ? (
+              <div className="mt-0.5 flex items-center gap-1">
+                {onTransferHost ? (
+                  <button
+                    type="button"
+                    className="pixel-btn ghost px-1 py-0.5 text-[9px]"
+                    title="Make host"
+                    onClick={() => onTransferHost(m.id)}
+                  >
+                    ⇄ HOST
+                  </button>
+                ) : null}
+                {onRemoveMember ? (
+                  <button
+                    type="button"
+                    className="pixel-btn danger px-1 py-0.5 text-[9px]"
+                    title="Remove from room"
+                    onClick={() => onRemoveMember(m.id)}
+                  >
+                    ✕
+                  </button>
+                ) : null}
+              </div>
             ) : null}
           </div>
         );

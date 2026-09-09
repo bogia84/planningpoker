@@ -20,7 +20,29 @@ export function RevealBoard({
 }) {
   const points = results.map((r) => r.point);
   const consensus = points.length > 0 && points.every((p) => p === points[0]);
-  const [finalPoint, setFinalPoint] = useState(points[0] ?? scaleValues[0] ?? "");
+
+  const numericPoints = points.map((p) => Number.parseFloat(p)).filter((n) => !Number.isNaN(n));
+  const averagePoint =
+    numericPoints.length > 1 ? numericPoints.reduce((a, b) => a + b, 0) / numericPoints.length : null;
+
+  function nearestScaleValue(target: number): string | null {
+    let best: { value: string; diff: number } | null = null;
+    for (const v of scaleValues) {
+      const n = Number.parseFloat(v);
+      if (Number.isNaN(n)) continue;
+      const diff = Math.abs(n - target);
+      if (!best || diff < best.diff) best = { value: v, diff };
+    }
+    return best?.value ?? null;
+  }
+
+  const defaultFinalPoint =
+    (consensus ? points[0] : null) ??
+    (averagePoint !== null ? nearestScaleValue(averagePoint) : null) ??
+    points[0] ??
+    scaleValues[0] ??
+    "";
+  const [finalPoint, setFinalPoint] = useState(defaultFinalPoint);
 
   return (
     <div className="pixel-panel flex flex-col gap-4 p-4">
@@ -31,6 +53,12 @@ export function RevealBoard({
       >
         {consensus ? "Consensus reached!" : "No consensus yet — discuss and consider a re-vote."}
       </div>
+
+      {!consensus && averagePoint !== null ? (
+        <div className="pixel-card bg-(--pp-panel) px-3 py-2 text-sm">
+          Average story point: <span className="font-bold">{averagePoint.toFixed(1)}</span>
+        </div>
+      ) : null}
 
       <ul className="flex flex-col gap-2">
         {results.map((r) => {

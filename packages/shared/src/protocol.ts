@@ -22,8 +22,8 @@ export interface HostConfigureMessage {
   stage: EstimationStage;
 }
 
-export interface HostAddStoryMessage {
-  type: "host_add_story";
+export interface AddStoryMessage {
+  type: "add_story";
   title: string;
   description?: string;
 }
@@ -35,8 +35,8 @@ export interface HostUpdateStoryMessage {
   description?: string;
 }
 
-export interface HostRemoveStoryMessage {
-  type: "host_remove_story";
+export interface RemoveStoryMessage {
+  type: "remove_story";
   storyId: string;
 }
 
@@ -84,13 +84,23 @@ export interface LeaveMessage {
   type: "leave";
 }
 
+export interface TransferHostMessage {
+  type: "transfer_host";
+  targetMemberId: string;
+}
+
+export interface RemoveMemberMessage {
+  type: "remove_member";
+  targetMemberId: string;
+}
+
 export type ClientMessage =
   | JoinMessage
   | SetAvatarMessage
   | HostConfigureMessage
-  | HostAddStoryMessage
+  | AddStoryMessage
   | HostUpdateStoryMessage
-  | HostRemoveStoryMessage
+  | RemoveStoryMessage
   | HostReorderStoriesMessage
   | HostStartStoryMessage
   | SubmitFactorScoresMessage
@@ -98,6 +108,8 @@ export type ClientMessage =
   | HostRevealMessage
   | HostStartRevoteMessage
   | HostFinalizeStoryMessage
-  | LeaveMessage;
+  | LeaveMessage
+  | TransferHostMessage
+  | RemoveMemberMessage;
 
 export type RoomAction = Exclude<ClientMessage, JoinMessage>;
