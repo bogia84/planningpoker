@@ -80,7 +80,7 @@ export function StoryQueue({
               <span className="truncate text-lg font-bold">{story.title}</span>
               <div className="flex shrink-0 items-center gap-2">
                 {isFinalized && story.finalPoint !== undefined ? (
-                  <span className="pixel-card bg-(--pp-success) px-2 py-0.5 text-sm font-bold text-white">
+                  <span className="pixel-card bg-(--pp-success) px-2.5 py-1 text-lg font-bold text-white">
                     {story.finalPoint}
                   </span>
                 ) : (

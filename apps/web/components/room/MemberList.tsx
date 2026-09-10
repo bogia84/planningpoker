@@ -1,7 +1,28 @@
 "use client";
 
+import { useMemo } from "react";
 import type { Member, RevealedResult, RoundPhase } from "@planningpoker/shared";
 import { PixelAvatar } from "@/components/avatar/PixelAvatar";
+
+const TABLE_QUOTES = [
+  "ROUND OF THE KNIGHTS",
+  "IN AGILE WE TRUST",
+  "8 POINTS? BOLD.",
+  "NO ESTIMATES WERE HARMED",
+  "THE FIBONACCI GUY STRIKES AGAIN",
+  "IT DEPENDS™",
+  "STANDUP SOON, HOLD THE LINE",
+  "SPRINT NOW, REGRET LATER",
+  "SIZE IT, DON'T FIGHT IT",
+  "WHOEVER PICKS 1 BUYS COFFEE",
+  "SCOPE CREEP IS WATCHING",
+  "THIS TICKET HAS TRUST ISSUES",
+  "MAY YOUR VELOCITY BE EVER STABLE",
+];
+
+function pickTableQuote(): string {
+  return TABLE_QUOTES[Math.floor(Math.random() * TABLE_QUOTES.length)] ?? TABLE_QUOTES[0];
+}
 
 export function MemberList({
   members,
@@ -33,13 +54,18 @@ export function MemberList({
   onRemoveMember?: (memberId: string) => void;
 }) {
   const seatCount = Math.max(members.length, 1);
+  const tableQuote = useMemo(() => pickTableQuote(), []);
 
   return (
     <div className="relative mx-auto aspect-3/2 w-full max-w-3xl">
-      <div className="pointer-events-none absolute inset-0 flex select-none items-center justify-center px-[12%]">
-        <span className="pixel-heading text-center text-2xl leading-tight tracking-wide opacity-15 sm:text-3xl">
-          ROUND OF THE KNIGHTS
-        </span>
+      <div className="pixel-card absolute inset-x-[16%] inset-y-[24.5%] select-none overflow-hidden bg-[#8a5a2b] p-[1.5%]">
+        <div className="h-full w-full rounded border-4 border-(--pp-ink) bg-[#1c1c1c] p-[5%]">
+          <div className="flex h-full w-full flex-col items-center justify-center rounded border-2 border-(--pp-ink)/40 bg-[#1f6e46] px-[8%]">
+            <span className="pixel-heading pointer-events-none text-center text-base leading-tight tracking-wide text-white/30 sm:text-lg">
+              {tableQuote}
+            </span>
+          </div>
+        </div>
       </div>
 
       {members.map((m, i) => {
