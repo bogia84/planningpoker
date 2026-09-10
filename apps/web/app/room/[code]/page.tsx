@@ -4,6 +4,7 @@ import { use, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { FactorScores } from "@planningpoker/shared";
 import { AvatarPicker } from "@/components/avatar/AvatarPicker";
+import { HelpButton } from "@/components/help/HelpButton";
 import { HistoryTable } from "@/components/history/HistoryTable";
 import { MemberList } from "@/components/room/MemberList";
 import { StoryQueue } from "@/components/room/StoryQueue";
@@ -12,6 +13,7 @@ import { PointCardDeck } from "@/components/room/PointCardDeck";
 import { RevealBoard } from "@/components/room/RevealBoard";
 import { DEFAULT_AVATAR_ID } from "@/lib/avatars";
 import { BASE_PATH } from "@/lib/basePath";
+import { ROOM_HELP_HOST, ROOM_HELP_PARTICIPANT, ROOM_JOIN_HELP } from "@/lib/helpContent";
 import { clearIdentity, loadHostToken, loadIdentity, saveIdentity } from "@/lib/identity";
 import { useRoomConnection, type JoinInfo } from "@/lib/useRoomConnection";
 
@@ -128,7 +130,10 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   if (!joinInfo) {
     return (
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-4 px-4 py-10">
-        <h1 className="pixel-heading text-lg text-[--pp-primary]">JOIN ROOM {roomCode}</h1>
+        <div className="flex items-center justify-between gap-2">
+          <h1 className="pixel-heading text-lg text-[--pp-primary]">JOIN ROOM {roomCode}</h1>
+          <HelpButton content={ROOM_JOIN_HELP} />
+        </div>
         {removedNotice ? (
           <p className="pixel-card bg-(--pp-danger) p-2 text-sm text-white">
             You were removed from this room by the host.
@@ -163,6 +168,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
           </p>
         </div>
         <div className="flex gap-2">
+          <HelpButton content={isHost ? ROOM_HELP_HOST : ROOM_HELP_PARTICIPANT} />
           <button
             type="button"
             className="pixel-btn ghost"

@@ -2,13 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { HelpButton } from "@/components/help/HelpButton";
+import { CREATE_HELP, HOME_HELP } from "@/lib/helpContent";
 
 export function SiteHeader() {
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const helpContent = isHome ? HOME_HELP : pathname === "/create" ? CREATE_HELP : null;
 
   return (
-    <div className="px-4 pt-4">
+    <div className="flex items-center justify-between gap-2 px-4 pt-4">
       {isHome ? (
         <a href="https://tamdoan.work" className="pixel-btn ghost inline-flex items-center gap-2">
           ← TAMDOAN.WORK
@@ -18,6 +21,7 @@ export function SiteHeader() {
           ← HOME
         </Link>
       )}
+      {helpContent ? <HelpButton content={helpContent} /> : null}
     </div>
   );
 }
