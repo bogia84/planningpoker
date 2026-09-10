@@ -10,14 +10,15 @@ function keyToRoomCode(key: string): string {
 // Every room mutation (createRoom/mutateRoom in roomStore.ts) does a full R2 put of the
 // whole record, so an object's `uploaded` timestamp is effectively the room's updatedAt —
 // letting us find stale rooms from list() metadata alone, without fetching each room's body.
-export async function listStaleRoomKeys(bucket: R2Bucket, cutoffMs: number): Promise<string[]> {
+// Pass cutoffMs = undefined to match every room (used for a full wipe).
+export async function listStaleRoomKeys(bucket: R2Bucket, cutoffMs?: number): Promise<string[]> {
   const staleKeys: string[] = [];
   let cursor: string | undefined;
 
   do {
     const page = await bucket.list({ prefix: ROOM_PREFIX, cursor });
     for (const object of page.objects) {
-      if (object.uploaded.getTime() < cutoffMs) {
+      if (cutoffMs === undefined || object.uploaded.getTime() < cutoffMs) {
         staleKeys.push(object.key);
       }
     }
