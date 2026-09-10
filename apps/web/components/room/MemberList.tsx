@@ -36,11 +36,10 @@ export function MemberList({
 
   return (
     <div className="relative mx-auto aspect-3/2 w-full max-w-3xl">
-      <div className="pixel-card absolute inset-x-[18%] inset-y-[24%] flex flex-col items-center justify-center gap-1.5 bg-[#B5732A]/25">
-        <span className="pixel-heading text-center text-sm opacity-50">ROUND OF THE KNIGHT</span>
-        <div className="pixel-card flex h-12 w-9 flex-col items-center justify-center gap-0.5 bg-(--pp-panel)">
-          <span className="text-xl leading-none">👑</span>
-        </div>
+      <div className="pointer-events-none absolute inset-0 flex select-none items-center justify-center px-[12%]">
+        <span className="pixel-heading text-center text-2xl leading-tight tracking-wide opacity-15 sm:text-3xl">
+          ROUND OF THE KNIGHTS
+        </span>
       </div>
 
       {members.map((m, i) => {
