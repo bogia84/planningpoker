@@ -9,7 +9,7 @@ export function HistoryTable({ entries }: { entries: SessionHistoryEntry[] }) {
     <div className="overflow-x-auto">
       <table className="w-full min-w-[640px] border-collapse text-sm">
         <thead>
-          <tr className="pixel-heading text-left text-[10px]">
+          <tr className="pixel-heading text-left text-sm">
             <th className="border-b-2 border-(--pp-ink) px-2 py-2">Story</th>
             <th className="border-b-2 border-(--pp-ink) px-2 py-2">Stage</th>
             <th className="border-b-2 border-(--pp-ink) px-2 py-2">Point</th>

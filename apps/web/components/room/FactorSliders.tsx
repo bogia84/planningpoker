@@ -20,7 +20,7 @@ export function FactorSliders({
       {FACTORS.map(({ key, label, hint }) => (
         <div key={key} className="flex flex-col gap-1">
           <div className="flex items-baseline justify-between">
-            <label className="pixel-heading text-xs">{label}</label>
+            <label className="pixel-heading text-sm">{label}</label>
             <span className="text-sm font-bold">{scores[key]}</span>
           </div>
           <input
@@ -30,7 +30,7 @@ export function FactorSliders({
             value={scores[key]}
             onChange={(e) => onChange({ ...scores, [key]: Number(e.target.value) })}
           />
-          <p className="text-xs opacity-60">{hint}</p>
+          <p className="text-sm opacity-60">{hint}</p>
         </div>
       ))}
     </div>

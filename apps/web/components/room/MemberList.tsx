@@ -37,7 +37,7 @@ export function MemberList({
   return (
     <div className="relative mx-auto aspect-3/2 w-full max-w-3xl">
       <div className="pixel-card absolute inset-x-[18%] inset-y-[24%] flex flex-col items-center justify-center gap-1.5 bg-[#B5732A]/25">
-        <span className="pixel-heading text-center text-[9px] opacity-50 sm:text-[11px]">ROUND OF THE KNIGHT</span>
+        <span className="pixel-heading text-center text-sm opacity-50">ROUND OF THE KNIGHT</span>
         <div className="pixel-card flex h-12 w-9 flex-col items-center justify-center gap-0.5 bg-(--pp-panel)">
           <span className="text-xl leading-none">👑</span>
         </div>
@@ -89,7 +89,7 @@ export function MemberList({
               ) : null}
               {isNudged ? (
                 <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full flex flex-col items-center gap-0.5">
-                  <span className="pixel-card whitespace-nowrap bg-(--pp-danger) px-2 py-1 text-xs font-bold text-white">
+                  <span className="pixel-card whitespace-nowrap bg-(--pp-danger) px-2 py-1 text-sm font-bold text-white">
                     {nudgeText}
                   </span>
                   <span className="animate-bounce text-lg leading-none" aria-label="Nudge to vote">
@@ -99,7 +99,7 @@ export function MemberList({
               ) : null}
               {roundOpen && pointDone ? (
                 <span
-                  className="absolute -top-1 -right-1 rounded-full bg-(--pp-success) px-1 text-[10px] leading-tight text-white"
+                  className="absolute -top-1 -right-1 rounded-full bg-(--pp-success) px-1 text-xs leading-tight text-white"
                   title="Voted"
                 >
                   ✓
@@ -111,29 +111,29 @@ export function MemberList({
               {m.name}
             </span>
             {m.isHost ? (
-              <span className="rounded bg-(--pp-warning) px-1.5 py-0.5 text-xs font-bold text-(--pp-ink)">
+              <span className="rounded bg-(--pp-warning) px-1.5 py-0.5 text-sm font-bold text-(--pp-ink)">
                 HOST
               </span>
             ) : null}
             {phase === "factors" && !factorsDone && m.connected ? (
-              <span className="text-[9px] opacity-50">scoring…</span>
+              <span className="text-sm opacity-50">scoring…</span>
             ) : null}
             {viewerIsHost && m.id !== selfMemberId ? (
               <div className="mt-0.5 flex items-center gap-1">
                 {onTransferHost ? (
                   <button
                     type="button"
-                    className="pixel-btn ghost px-1 py-0.5 text-[9px]"
+                    className="pixel-btn ghost px-1.5 py-0.5 text-sm"
                     title="Make host"
                     onClick={() => onTransferHost(m.id)}
                   >
-                    ⇄ HOST
+                    ⇄
                   </button>
                 ) : null}
                 {onRemoveMember ? (
                   <button
                     type="button"
-                    className="pixel-btn danger px-1 py-0.5 text-[9px]"
+                    className="pixel-btn danger px-1.5 py-0.5 text-sm"
                     title="Remove from room"
                     onClick={() => onRemoveMember(m.id)}
                   >

@@ -157,7 +157,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="pixel-heading text-lg text-[--pp-primary]">ROOM {roomCode}</h1>
-          <p className="text-xs opacity-60">
+          <p className="text-sm opacity-60">
             {status === "open" ? "Connected" : status === "connecting" ? "Connecting..." : "Disconnected — retrying"}
             {state ? ` · ${state.config.stage === "rough" ? "Rough estimation" : "Sprint plan estimation"}` : ""}
           </p>
@@ -184,7 +184,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
         <>
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
             <section className="pixel-panel min-w-0 flex-1 p-4">
-              <h2 className="pixel-heading mb-3 text-xs">TEAM</h2>
+              <h2 className="pixel-heading mb-3 text-sm">TEAM</h2>
               <MemberList
                 members={state.members}
                 phase={state.round?.phase}
@@ -255,10 +255,10 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
                         {nudgeMemberIds.filter((id) => !state.round!.submittedPointMemberIds.includes(id))
                           .length > 0 ? (
                           <>
-                            <span className="text-xs opacity-60">Still waiting on some votes.</span>
+                            <span className="text-sm opacity-60">Still waiting on some votes.</span>
                             <button
                               type="button"
-                              className="pixel-btn danger self-start text-xs"
+                              className="pixel-btn danger self-start"
                               onClick={() => send({ type: "host_reveal", storyId: activeStory.id })}
                             >
                               REVEAL ANYWAY
@@ -280,7 +280,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
           </div>
 
           <section className="pixel-panel p-4">
-            <h2 className="pixel-heading mb-3 text-xs">STORY QUEUE</h2>
+            <h2 className="pixel-heading mb-3 text-sm">STORY QUEUE</h2>
             <StoryQueue
               stories={state.stories}
               isHost={isHost}
@@ -294,10 +294,10 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
           {state.history.length > 0 ? (
             <section className="pixel-panel p-4">
               <div className="mb-3 flex items-center justify-between">
-                <h2 className="pixel-heading text-xs">SESSION HISTORY</h2>
+                <h2 className="pixel-heading text-sm">SESSION HISTORY</h2>
                 <a
                   href={`${BASE_PATH}/api/rooms/${roomCode}/export`}
-                  className="pixel-btn ghost text-xs"
+                  className="pixel-btn ghost"
                 >
                   DOWNLOAD CSV
                 </a>

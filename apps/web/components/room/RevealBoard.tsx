@@ -117,7 +117,7 @@ function Gauge({ label, value }: { label: string; value: number }) {
   const pct = Math.max(0, Math.min(100, (value / 10) * 100));
   return (
     <div className="flex flex-col gap-0.5 text-left">
-      <div className="flex items-center justify-between text-[10px] font-bold">
+      <div className="flex items-center justify-between text-sm font-bold">
         <span>{label}</span>
         <span>{value}/10</span>
       </div>

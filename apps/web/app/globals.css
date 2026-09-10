@@ -68,7 +68,7 @@
 
   .pixel-btn {
     font-family: var(--font-pixel-heading), monospace;
-    font-size: 12px;
+    font-size: 14px;
     background: var(--pp-primary);
     color: white;
     border: 3px solid var(--pp-ink);

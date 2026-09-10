@@ -84,7 +84,7 @@ export function StoryQueue({
                     {story.finalPoint}
                   </span>
                 ) : (
-                  <span className="text-xs opacity-60">{STATUS_LABEL[story.status]}</span>
+                  <span className="text-sm opacity-60">{STATUS_LABEL[story.status]}</span>
                 )}
                 {isHost && story.status === "pending" && !activeStoryId ? (
                   <button type="button" className="pixel-btn" onClick={() => onStartStory(story.id)}>
@@ -94,7 +94,7 @@ export function StoryQueue({
                 {story.id !== activeStoryId ? (
                   <button
                     type="button"
-                    className="pixel-btn danger px-2 py-1 text-xs"
+                    className="pixel-btn danger px-2 py-1"
                     title="Remove story"
                     onClick={() => onRemoveStory(story.id)}
                   >

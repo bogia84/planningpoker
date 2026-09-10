@@ -10,11 +10,11 @@ export function SiteHeader() {
   return (
     <div className="px-4 pt-4">
       {isHome ? (
-        <a href="https://tamdoan.work" className="pixel-btn ghost inline-flex items-center gap-2 text-xs">
+        <a href="https://tamdoan.work" className="pixel-btn ghost inline-flex items-center gap-2">
           ← TAMDOAN.WORK
         </a>
       ) : (
-        <Link href="/" className="pixel-btn ghost inline-flex items-center gap-2 text-xs">
+        <Link href="/" className="pixel-btn ghost inline-flex items-center gap-2">
           ← HOME
         </Link>
       )}
