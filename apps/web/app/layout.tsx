@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Press_Start_2P, VT323 } from "next/font/google";
+import { Press_Start_2P, VT323, Inter } from "next/font/google";
 import { SiteHeader } from "@/components/nav/SiteHeader";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { BASE_PATH } from "@/lib/basePath";
 import "./globals.css";
 
@@ -16,8 +17,18 @@ const pixelBody = VT323({
   subsets: ["latin"],
 });
 
+const docsSans = Inter({
+  variable: "--font-docs-sans",
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+});
+
 const title = "Planning Poker";
-const description = "A fun, 8-bit styled planning poker tool for Scrum teams";
+const description = "A planning poker tool for Scrum teams";
+
+// Keep in sync with apps/web/lib/theme.ts (THEME_STORAGE_KEY / DEFAULT_THEME).
+// Runs before first paint so the chosen theme applies with no flash.
+const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem("pp-theme");if(t!=="pixel"&&t!=="docs"){t="docs";}document.documentElement.setAttribute("data-theme",t);}catch(e){document.documentElement.setAttribute("data-theme","docs");}})();`;
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://tamdoan.work"),
@@ -43,11 +54,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${pixelHeading.variable} ${pixelBody.variable} h-full`}
+      className={`${pixelHeading.variable} ${pixelBody.variable} ${docsSans.variable} h-full`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
-        <SiteHeader />
-        {children}
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        <ThemeProvider>
+          <SiteHeader />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

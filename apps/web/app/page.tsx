@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ThemePicker } from "@/components/theme/ThemePicker";
 import { APP_VERSION } from "@/lib/version";
 
 export default function HomePage() {
@@ -18,14 +19,16 @@ export default function HomePage() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-10 px-4 py-16 text-center">
       <div>
-        <h1 className="pixel-heading text-3xl sm:text-4xl text-(--pp-primary) drop-shadow-[3px_3px_0_var(--pp-ink)]">
+        <h1 className="pixel-heading text-3xl sm:text-4xl text-(--pp-primary) drop-shadow-(--pp-heading-shadow)">
           PLANNING
           <br />
           POKER
         </h1>
         <p className="mt-2 text-sm uppercase tracking-widest opacity-50">v{APP_VERSION}</p>
-        <p className="mt-4 text-lg">Estimate user stories with your Scrum team. 8-bit style.</p>
+        <p className="mt-4 text-lg">Estimate user stories with your Scrum team.</p>
       </div>
+
+      <ThemePicker />
 
       <div className="pixel-panel flex w-full max-w-sm flex-col gap-6 p-6">
         <Link href="/create" className="pixel-btn text-center">
