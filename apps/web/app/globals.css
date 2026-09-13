@@ -257,4 +257,36 @@
   [data-theme="docs"] .pp-table tbody tr:last-child td {
     border-bottom: none;
   }
+
+  .pp-board-outer {
+    background: #8a5a2b;
+  }
+
+  .pp-board-frame {
+    background: #1c1c1c;
+  }
+
+  .pp-board-surface {
+    background: #1f6e46;
+  }
+
+  .pp-board-quote {
+    color: rgb(255 255 255 / 30%);
+  }
+
+  [data-theme="docs"] .pp-board-outer {
+    background: var(--pp-panel);
+  }
+
+  [data-theme="docs"] .pp-board-frame {
+    background: var(--pp-bg);
+  }
+
+  [data-theme="docs"] .pp-board-surface {
+    background: color-mix(in srgb, var(--pp-primary) 8%, var(--pp-panel));
+  }
+
+  [data-theme="docs"] .pp-board-quote {
+    color: color-mix(in srgb, var(--pp-primary) 55%, transparent);
+  }
 }

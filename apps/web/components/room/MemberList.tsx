@@ -58,10 +58,10 @@ export function MemberList({
 
   return (
     <div className="relative mx-auto aspect-3/2 w-full max-w-3xl">
-      <div className="pixel-card absolute inset-x-[16%] inset-y-[24.5%] select-none overflow-hidden bg-[#8a5a2b] p-[1.5%]">
-        <div className="h-full w-full rounded border-4 border-(--pp-ink) bg-[#1c1c1c] p-[5%]">
-          <div className="flex h-full w-full flex-col items-center justify-center rounded border-2 border-(--pp-ink)/40 bg-[#1f6e46] px-[8%]">
-            <span className="pixel-heading pointer-events-none text-center text-base leading-tight tracking-wide text-white/30 sm:text-lg">
+      <div className="pixel-card pp-board-outer absolute inset-x-[16%] inset-y-[24.5%] select-none overflow-hidden p-[1.5%]">
+        <div className="pp-board-frame h-full w-full rounded border-4 border-(--pp-ink) p-[5%]">
+          <div className="pp-board-surface flex h-full w-full flex-col items-center justify-center rounded border-2 border-(--pp-ink)/40 px-[8%]">
+            <span className="pp-board-quote pixel-heading pointer-events-none text-center text-base leading-tight tracking-wide sm:text-lg">
               {tableQuote}
             </span>
           </div>
