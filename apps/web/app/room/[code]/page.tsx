@@ -227,31 +227,40 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
                   />
                 ) : (
                   <>
-                    {selfId &&
-                    state.round.submittedFactorMemberIds.includes(selfId) &&
-                    state.round.submittedPointMemberIds.includes(selfId) ? (
-                      <div className="pixel-card p-4 text-sm">Vote submitted — waiting for others.</div>
-                    ) : (
-                      <div className="pixel-panel flex flex-col gap-4 p-4">
-                        <FactorSliders scores={voteScores} onChange={setVoteScores} />
-                        <PointCardDeck
-                          scaleValues={state.config.scaleValues}
-                          selected={votePoint}
-                          onSelect={setVotePoint}
-                        />
-                        <button
-                          type="button"
-                          className="pixel-btn secondary self-start"
-                          disabled={!votePoint}
-                          onClick={() => {
-                            send({ type: "submit_factor_scores", storyId: activeStory.id, ...voteScores });
-                            send({ type: "submit_point", storyId: activeStory.id, value: votePoint! });
-                          }}
-                        >
-                          SUBMIT VOTE
-                        </button>
-                      </div>
-                    )}
+                    {(() => {
+                      const hasVoted =
+                        !!selfId &&
+                        state.round!.submittedFactorMemberIds.includes(selfId) &&
+                        state.round!.submittedPointMemberIds.includes(selfId);
+                      return (
+                        <div className="flex flex-col gap-4">
+                          {hasVoted ? (
+                            <div className="pixel-card p-4 text-sm">
+                              Vote submitted — waiting for others. You can still change your vote below.
+                            </div>
+                          ) : null}
+                          <div className="pixel-panel flex flex-col gap-4 p-4">
+                            <FactorSliders scores={voteScores} onChange={setVoteScores} />
+                            <PointCardDeck
+                              scaleValues={state.config.scaleValues}
+                              selected={votePoint}
+                              onSelect={setVotePoint}
+                            />
+                            <button
+                              type="button"
+                              className="pixel-btn secondary self-start"
+                              disabled={!votePoint}
+                              onClick={() => {
+                                send({ type: "submit_factor_scores", storyId: activeStory.id, ...voteScores });
+                                send({ type: "submit_point", storyId: activeStory.id, value: votePoint! });
+                              }}
+                            >
+                              I&apos;M READY
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })()}
 
                     {isHost ? (
                       <div className="flex flex-wrap items-center gap-2">
