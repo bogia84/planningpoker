@@ -232,12 +232,12 @@
 
   [data-theme="docs"] .pp-table thead th {
     font-size: 0.6875rem;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: rgb(23 43 77 / 65%);
-    background: #f4f5f7;
-    border-bottom: 1px solid var(--pp-border);
+    color: var(--pp-primary-dark);
+    background: color-mix(in srgb, var(--pp-primary) 7%, var(--pp-panel));
+    border-bottom: 2px solid var(--pp-primary);
     padding: 0.65rem 0.85rem;
   }
 
@@ -251,7 +251,7 @@
   }
 
   [data-theme="docs"] .pp-table tbody tr:hover {
-    background: rgb(9 30 66 / 4%);
+    background: color-mix(in srgb, var(--pp-primary) 6%, transparent);
   }
 
   [data-theme="docs"] .pp-table tbody tr:last-child td {
