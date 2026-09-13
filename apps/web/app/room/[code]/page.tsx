@@ -102,6 +102,20 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
     setVotePoint(null);
   }, [activeStory?.id, state?.round?.roundNumber]);
 
+  function updateFactorScores(scores: FactorScores) {
+    setVoteScores(scores);
+    if (votePoint && activeStory) {
+      send({ type: "submit_factor_scores", storyId: activeStory.id, ...scores });
+    }
+  }
+
+  function selectPoint(value: string) {
+    if (!activeStory) return;
+    setVotePoint(value);
+    send({ type: "submit_factor_scores", storyId: activeStory.id, ...voteScores });
+    send({ type: "submit_point", storyId: activeStory.id, value });
+  }
+
   function handleRevealClick() {
     if (!activeStory || !state?.round) return;
     const missing = state.members
@@ -240,23 +254,12 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
                             </div>
                           ) : null}
                           <div className="pixel-panel flex flex-col gap-4 p-4">
-                            <FactorSliders scores={voteScores} onChange={setVoteScores} />
+                            <FactorSliders scores={voteScores} onChange={updateFactorScores} />
                             <PointCardDeck
                               scaleValues={state.config.scaleValues}
                               selected={votePoint}
-                              onSelect={setVotePoint}
+                              onSelect={selectPoint}
                             />
-                            <button
-                              type="button"
-                              className="pixel-btn secondary self-start"
-                              disabled={!votePoint}
-                              onClick={() => {
-                                send({ type: "submit_factor_scores", storyId: activeStory.id, ...voteScores });
-                                send({ type: "submit_point", storyId: activeStory.id, value: votePoint! });
-                              }}
-                            >
-                              I&apos;M READY
-                            </button>
                           </div>
                         </div>
                       );
