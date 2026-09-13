@@ -1,7 +1,7 @@
 "use client";
 
 import { AVATAR_CHARACTERS } from "@/lib/avatars";
-import { PixelAvatar } from "./PixelAvatar";
+import { Avatar } from "./Avatar";
 
 export function AvatarPicker({
   value,
@@ -24,7 +24,7 @@ export function AvatarPicker({
               : "border-transparent hover:border-(--pp-ink)/30"
           }`}
         >
-          <PixelAvatar avatarId={character.id} size={40} />
+          <Avatar avatarId={character.id} size={40} />
         </button>
       ))}
     </div>

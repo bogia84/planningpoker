@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import type { Member, RevealedResult, RoundPhase } from "@planningpoker/shared";
-import { PixelAvatar } from "@/components/avatar/PixelAvatar";
+import { Avatar } from "@/components/avatar/Avatar";
 
 const TABLE_QUOTES = [
   "ROUND OF THE KNIGHTS",
@@ -130,7 +130,7 @@ export function MemberList({
                   ✓
                 </span>
               ) : null}
-              <PixelAvatar avatarId={m.avatarId} size={36} />
+              <Avatar avatarId={m.avatarId} size={36} />
             </div>
             <span className="pixel-card max-w-[7rem] truncate bg-(--pp-panel) px-1.5 py-0.5 text-sm font-bold">
               {m.name}
