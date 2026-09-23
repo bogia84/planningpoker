@@ -23,8 +23,9 @@ const docsSans = Inter({
   subsets: ["latin"],
 });
 
-const title = "Planning Poker";
-const description = "A planning poker tool for Scrum teams";
+const title = "Free Planning Poker Tool for Agile Scrum Teams";
+const description =
+  "Free online planning poker for agile Scrum teams. Create a room, invite your team, and estimate story points together in real time — no sign-up required.";
 
 // Keep in sync with apps/web/lib/theme.ts (THEME_STORAGE_KEY / DEFAULT_THEME).
 // Runs before first paint so the chosen theme applies with no flash.
@@ -32,13 +33,33 @@ const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem("pp-theme"
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://tamdoan.work"),
-  title,
+  title: {
+    default: title,
+    template: `%s | Planning Poker`,
+  },
   description,
+  keywords: [
+    "planning poker",
+    "free planning poker",
+    "planning poker online",
+    "scrum poker",
+    "agile estimation tool",
+    "story point estimation",
+    "sprint planning tool",
+    "scrum estimation game",
+  ],
+  alternates: {
+    canonical: BASE_PATH,
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   openGraph: {
     title,
     description,
     url: BASE_PATH,
-    siteName: title,
+    siteName: "Planning Poker",
     images: [{ url: `${BASE_PATH}/og-image.png`, width: 1200, height: 630, alt: title }],
     type: "website",
   },

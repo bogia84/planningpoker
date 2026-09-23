@@ -18,6 +18,20 @@ export default function HomePage() {
 
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-10 px-4 py-16 text-center">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            name: "Planning Poker",
+            description: "Free online planning poker tool for agile Scrum teams to estimate story points together in real time.",
+            applicationCategory: "BusinessApplication",
+            operatingSystem: "Any",
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+          }),
+        }}
+      />
       <div>
         <h1 className="pixel-heading text-3xl sm:text-4xl text-(--pp-primary) drop-shadow-(--pp-heading-shadow)">
           PLANNING
