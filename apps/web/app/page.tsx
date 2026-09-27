@@ -25,7 +25,7 @@ export default function HomePage() {
             "@context": "https://schema.org",
             "@type": "WebApplication",
             name: "Planning Poker",
-            description: "Free online planning poker tool for agile Scrum teams to estimate story points together in real time.",
+            description: "Free planning poker online for agile Scrum teams — no sign-up required. Estimate story points together in real time.",
             applicationCategory: "BusinessApplication",
             operatingSystem: "Any",
             offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },

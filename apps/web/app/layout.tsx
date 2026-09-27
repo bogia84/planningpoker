@@ -23,9 +23,9 @@ const docsSans = Inter({
   subsets: ["latin"],
 });
 
-const title = "Free Planning Poker Tool for Agile Scrum Teams";
+const title = "Free Planning Poker Online for Agile Scrum Teams";
 const description =
-  "Free online planning poker for agile Scrum teams. Create a room, invite your team, and estimate story points together in real time — no sign-up required.";
+  "Free planning poker online for agile Scrum teams — no sign-up, no account. Create a room, invite your team, and estimate story points together in real time.";
 
 // Keep in sync with apps/web/lib/theme.ts (THEME_STORAGE_KEY / DEFAULT_THEME).
 // Runs before first paint so the chosen theme applies with no flash.
@@ -47,6 +47,8 @@ export const metadata: Metadata = {
     "story point estimation",
     "sprint planning tool",
     "scrum estimation game",
+    "planning poker no sign up",
+    "remote team estimation tool",
   ],
   alternates: {
     canonical: BASE_PATH,
