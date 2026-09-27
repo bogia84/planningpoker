@@ -17,6 +17,7 @@ export interface SetAvatarMessage {
 
 export interface HostConfigureMessage {
   type: "host_configure";
+  sessionName: string;
   scaleType: ScaleType;
   scaleValues: string[];
   stage: EstimationStage;

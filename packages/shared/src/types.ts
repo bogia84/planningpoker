@@ -13,6 +13,7 @@ export const SCALE_PRESETS: Record<Exclude<ScaleType, "custom">, string[]> = {
 };
 
 export interface RoomConfig {
+  sessionName: string;
   scaleType: ScaleType;
   scaleValues: string[];
   stage: EstimationStage;

@@ -84,6 +84,7 @@ export function applyAction(record: RoomRecord, memberId: string, message: RoomA
     case "host_configure": {
       requireHost();
       const config: RoomConfig = {
+        sessionName: message.sessionName || record.config.sessionName,
         scaleType: message.scaleType as ScaleType,
         scaleValues: message.scaleValues,
         stage: message.stage as EstimationStage,

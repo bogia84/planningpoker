@@ -175,8 +175,12 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
     <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 py-8">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="pixel-heading text-lg text-[--pp-primary]">ROOM {roomCode}</h1>
+          <h1 className="pixel-heading text-lg text-[--pp-primary]">
+            {state?.config.sessionName ?? `ROOM ${roomCode}`}
+          </h1>
           <p className="text-sm opacity-60">
+            {`ROOM ${roomCode}`}
+            {" · "}
             {status === "open" ? "Connected" : status === "connecting" ? "Connecting..." : "Disconnected — retrying"}
             {state ? ` · ${state.config.stage === "rough" ? "Rough estimation" : "Sprint plan estimation"}` : ""}
           </p>

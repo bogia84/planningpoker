@@ -13,6 +13,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ cod
 
   return NextResponse.json({
     roomCode: room.record.roomCode,
+    sessionName: room.record.config.sessionName,
     scaleType: room.record.config.scaleType,
     scaleValues: room.record.config.scaleValues,
     stage: room.record.config.stage,

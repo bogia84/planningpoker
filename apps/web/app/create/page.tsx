@@ -14,6 +14,7 @@ export default function CreateRoomPage() {
   const router = useRouter();
 
   const [name, setName] = useState("");
+  const [sessionName, setSessionName] = useState("");
   const [avatarId, setAvatarId] = useState(DEFAULT_AVATAR_ID);
   const [scaleType, setScaleType] = useState<ScaleType>("modified_fibonacci");
   const [customValues, setCustomValues] = useState("");
@@ -32,6 +33,7 @@ export default function CreateRoomPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          sessionName: sessionName.trim() || undefined,
           scaleType,
           scaleValues:
             scaleType === "custom"
@@ -64,7 +66,18 @@ export default function CreateRoomPage() {
       <h1 className="pixel-heading text-xl text-(--pp-primary)">HOST A ROOM</h1>
 
       <section className="pixel-panel flex flex-col gap-3 p-5">
-        <h2 className="pixel-heading text-sm">1. Your name &amp; avatar</h2>
+        <h2 className="pixel-heading text-sm">1. Session name</h2>
+        <input
+          className="pixel-input"
+          placeholder={`Optional — defaults to "Session - ${new Date().toLocaleDateString("en-US")}"`}
+          value={sessionName}
+          onChange={(e) => setSessionName(e.target.value)}
+          maxLength={60}
+        />
+      </section>
+
+      <section className="pixel-panel flex flex-col gap-3 p-5">
+        <h2 className="pixel-heading text-sm">2. Your name &amp; avatar</h2>
         <input
           className="pixel-input"
           placeholder="Your name"
@@ -76,7 +89,7 @@ export default function CreateRoomPage() {
       </section>
 
       <section className="pixel-panel flex flex-col gap-3 p-5">
-        <h2 className="pixel-heading text-sm">2. Point scale</h2>
+        <h2 className="pixel-heading text-sm">3. Point scale</h2>
         <ScaleConfigForm
           scaleType={scaleType}
           customValues={customValues}
@@ -86,7 +99,7 @@ export default function CreateRoomPage() {
       </section>
 
       <section className="pixel-panel flex flex-col gap-3 p-5">
-        <h2 className="pixel-heading text-sm">3. Estimation stage</h2>
+        <h2 className="pixel-heading text-sm">4. Estimation stage</h2>
         <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
@@ -106,7 +119,7 @@ export default function CreateRoomPage() {
       </section>
 
       <section className="pixel-panel flex flex-col gap-3 p-5">
-        <h2 className="pixel-heading text-sm">4. Story queue</h2>
+        <h2 className="pixel-heading text-sm">5. Story queue</h2>
         <StoryListEditor stories={stories} onChange={setStories} />
       </section>
 

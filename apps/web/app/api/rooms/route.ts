@@ -5,10 +5,19 @@ import { generateRoomCode } from "@/lib/roomCode";
 import { createRoom, type RoomRecord } from "@/lib/roomStore";
 
 interface CreateRoomBody {
+  sessionName?: string;
   scaleType: ScaleType;
   scaleValues?: string[];
   stage: EstimationStage;
   stories?: { title: string; description?: string }[];
+}
+
+function defaultSessionName(): string {
+  const now = new Date();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  const yyyy = now.getFullYear();
+  return `Session - ${mm}/${dd}/${yyyy}`;
 }
 
 export async function POST(request: Request) {
@@ -30,6 +39,7 @@ export async function POST(request: Request) {
   const { env } = getCloudflareContext();
   const hostToken = crypto.randomUUID();
   const now = Date.now();
+  const sessionName = body.sessionName?.trim() || defaultSessionName();
 
   const stories = (body.stories ?? []).map((story, index) => ({
     id: crypto.randomUUID(),
@@ -45,7 +55,7 @@ export async function POST(request: Request) {
     const record: RoomRecord = {
       roomCode: candidate,
       hostToken,
-      config: { scaleType: body.scaleType, scaleValues, stage: body.stage },
+      config: { sessionName, scaleType: body.scaleType, scaleValues, stage: body.stage },
       stories,
       members: [],
       activeStoryId: null,
