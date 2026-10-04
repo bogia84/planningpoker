@@ -131,15 +131,19 @@ export function MemberList({
                 </span>
               ) : null}
               <Avatar avatarId={m.avatarId} size={36} />
+              {m.isHost ? (
+                <span
+                  className="pixel-card absolute -top-2 left-1/2 z-10 flex h-5 w-5 -translate-x-1/2 items-center justify-center rounded-full bg-(--pp-warning) text-[10px] font-bold leading-none text-(--pp-ink)"
+                  title="Host"
+                  aria-label="Host"
+                >
+                  D
+                </span>
+              ) : null}
             </div>
             <span className="pixel-card max-w-[7rem] truncate bg-(--pp-panel) px-1.5 py-0.5 text-sm font-bold">
               {m.name}
             </span>
-            {m.isHost ? (
-              <span className="rounded bg-(--pp-warning) px-1.5 py-0.5 text-sm font-bold text-(--pp-ink)">
-                HOST
-              </span>
-            ) : null}
             {phase === "factors" && !factorsDone && m.connected ? (
               <span className="text-sm opacity-50">scoring…</span>
             ) : null}
