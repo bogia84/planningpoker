@@ -7,6 +7,10 @@ function keyToRoomCode(key: string): string {
   return key.slice(ROOM_PREFIX.length, -".json".length);
 }
 
+export function roomCodeToKey(roomCode: string): string {
+  return `${ROOM_PREFIX}${roomCode.toUpperCase()}.json`;
+}
+
 // Every room mutation (createRoom/mutateRoom in roomStore.ts) does a full R2 put of the
 // whole record, so an object's `uploaded` timestamp is effectively the room's updatedAt —
 // letting us find stale rooms from list() metadata alone, without fetching each room's body.
