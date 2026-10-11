@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import type { Member, RevealedResult, RoundPhase } from "@planningpoker/shared";
 import { Avatar } from "@/components/avatar/Avatar";
 import { HostChipBadge } from "@/components/room/HostChipBadge";
+import { HostPlayedCard } from "@/components/room/HostPlayedCard";
 
 const TABLE_QUOTES = [
   "ROUND OF THE KNIGHTS",
@@ -56,15 +57,22 @@ export function MemberList({
 }) {
   const seatCount = Math.max(members.length, 1);
   const tableQuote = useMemo(() => pickTableQuote(), []);
+  const host = members.find((m) => m.isHost);
+  const hostPlayedPoint =
+    phase === "revealed" ? results?.find((r) => r.memberId === host?.id)?.point : undefined;
 
   return (
     <div className="relative mx-auto aspect-3/2 w-full max-w-3xl">
       <div className="pixel-card pp-board-outer absolute inset-x-[16%] inset-y-[24.5%] select-none overflow-hidden p-[1.5%]">
         <div className="pp-board-frame h-full w-full rounded border-4 border-(--pp-ink) p-[5%]">
           <div className="pp-board-surface flex h-full w-full flex-col items-center justify-center rounded border-2 border-(--pp-ink)/40 px-[8%]">
-            <span className="pp-board-quote pixel-heading pointer-events-none text-center text-base leading-tight tracking-wide sm:text-lg">
-              {tableQuote}
-            </span>
+            {hostPlayedPoint !== undefined ? (
+              <HostPlayedCard key={`${host?.id}-${hostPlayedPoint}`} point={hostPlayedPoint} />
+            ) : (
+              <span className="pp-board-quote pixel-heading pointer-events-none text-center text-base leading-tight tracking-wide sm:text-lg">
+                {tableQuote}
+              </span>
+            )}
           </div>
         </div>
       </div>
