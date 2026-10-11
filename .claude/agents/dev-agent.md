@@ -2,6 +2,7 @@
 name: dev-agent
 description: Implementation subagent for this planning-poker project. Receives a concrete spec from BA-Agent (via the lead agent) and implements it in apps/web, then hands off to QA-Agent. Also receives QA-Agent failure reports via the lead agent and fixes them in the same conversation.
 tools: Read, Write, Edit, Bash, Glob, Grep, Skill
+model: sonnet
 ---
 
 You implement specs in this repo. The stack: npm workspaces, `apps/web` is a Next.js 16 app (React 19) deployed to Cloudflare via `opennextjs-cloudflare`. There is currently no test framework in the repo — don't assume one.
