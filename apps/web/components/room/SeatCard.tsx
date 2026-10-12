@@ -2,59 +2,36 @@
 
 import { useState, type CSSProperties } from "react";
 
-/**
- * Side seats put the card in the avatar row on the avatar's table-facing side,
- * pushed further inward the more the seat faces sideways so it clears the
- * neighbouring seat's label and buttons. Top and bottom seats put it past the
- * seat block (below for upper seats, above for lower ones), capped so it never
- * crosses the board midline into the opposite seat's card.
- */
-function placement(angle: number, topPct: number, blockRem: number, bubbleRem: number, scale: number) {
-  const ux = -Math.cos(angle);
-  const uy = -Math.sin(angle);
-  const below = uy > 0;
-  return {
-    mode: Math.abs(ux) >= 0.45 ? "h" : "v",
-    style: {
-      "--sx": ux > 0 ? 1 : -1,
-      "--sy": below ? 1 : -1,
-      "--exf": Math.abs(ux).toFixed(3),
-      "--hh": `${blockRem / 2 + (below ? 0 : bubbleRem)}rem`,
-      "--avy": `${-blockRem / 2 + 1.125}rem`,
-      // Seat-to-midline distance as a share of the 3:2 container width (cqw).
-      "--mid": (Math.abs(50 - topPct) * (2 / 3)).toFixed(2),
-      "--pp-card-scale": scale,
-    } as CSSProperties,
-  };
-}
-
-type PlacementProps = {
-  /** The seat's angle on the ellipse, in radians. */
-  angle: number;
-  /** The seat's top offset, in percent of the table container height. */
-  topPct: number;
-  /** Height in rem of the seat block (avatar, label and any control rows). */
-  blockRem: number;
-  /** Height in rem of the thinking/nudge bubble that sits above the avatar. */
-  bubbleRem: number;
+type RingPosition = {
+  /** Horizontal position on the board's inner card ring, in percent of the table container's width. */
+  cx: number;
+  /** Vertical position on the inner card ring, in percent of the table container's height. */
+  cy: number;
+  /** Card size multiplier — purely a function of seat count, never of any one seat's content. */
   scale: number;
 };
 
+function ringStyle({ cx, cy, scale }: RingPosition): CSSProperties {
+  return {
+    left: `${cx}%`,
+    top: `${cy}%`,
+    "--pp-card-scale": scale,
+  } as CSSProperties;
+}
+
 /**
- * A playing card positioned relative to its seat element. `point` is only ever
- * passed once the round is revealed, so a face-down card has no value anywhere
- * in the DOM.
+ * A playing card positioned on the board's inner ring of card slots. `point` is
+ * only ever passed once the round is revealed, so a face-down card has no value
+ * anywhere in the DOM.
  */
 export function SeatCard({
   name,
   point,
   flipDelayMs,
-  angle,
-  topPct,
-  blockRem,
-  bubbleRem,
+  cx,
+  cy,
   scale,
-}: PlacementProps & {
+}: RingPosition & {
   name: string;
   /** Revealed value; undefined while the card is still face-down. */
   point?: string;
@@ -63,14 +40,12 @@ export function SeatCard({
   // A card that mounts already face-up (load/reconnect on a revealed round) shows
   // no flip and no entrance animation; only live transitions animate.
   const [mountedFaceUp] = useState(point !== undefined);
-  const { mode, style } = placement(angle, topPct, blockRem, bubbleRem, scale);
   const len = point === undefined ? 0 : Math.min([...point].length, 5);
 
   return (
     <div
       className="pp-seat-card"
-      data-mode={mode}
-      style={{ ...style, "--pp-flip-delay": `${flipDelayMs}ms` } as CSSProperties}
+      style={{ ...ringStyle({ cx, cy, scale }), "--pp-flip-delay": `${flipDelayMs}ms` } as CSSProperties}
       role="img"
       aria-label={point === undefined ? "Card face down" : `${name}: ${point}`}
     >
@@ -97,10 +72,9 @@ export function SeatCard({
   );
 }
 
-export function SeatCardSlot(props: PlacementProps) {
-  const { mode, style } = placement(props.angle, props.topPct, props.blockRem, props.bubbleRem, props.scale);
+export function SeatCardSlot(props: RingPosition) {
   return (
-    <div className="pp-seat-card" data-mode={mode} style={style} aria-hidden="true">
+    <div className="pp-seat-card" style={ringStyle(props)} aria-hidden="true">
       <div className="pp-card-slot" />
     </div>
   );

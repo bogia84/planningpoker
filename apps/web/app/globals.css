@@ -291,48 +291,23 @@
   }
 
   .pp-seat-card {
-    --pp-card-w: calc(28px * var(--pp-card-scale, 1));
+    /* cqw here resolves against the nearest ancestor container (pp-seat-root), not
+       this element's own box, so the card's pixel size shrinks in lockstep with the
+       board itself at narrow widths — not just with --pp-card-scale (seatCount). */
+    --pp-card-w: calc(3.75cqw * var(--pp-card-scale, 1));
     --pp-card-h: calc(var(--pp-card-w) * 1.4);
     position: absolute;
-    left: 50%;
-    top: 50%;
     z-index: 1;
     width: var(--pp-card-w);
     height: var(--pp-card-h);
+    transform: translate(-50%, -50%);
     pointer-events: none;
     perspective: 400px;
     container-type: inline-size;
   }
 
-  .pp-seat-card[data-mode="h"] {
-    transform: translate(
-      calc(-50% + var(--sx) * (22px + var(--pp-card-w) / 2 + var(--exf) * clamp(0px, (100cqw - 304px) * 0.75, 52px))),
-      calc(-50% + var(--avy) + 18px - var(--pp-card-h) / 2)
-    );
-  }
-
-  .pp-seat-card[data-mode="v"] {
-    transform: translate(
-      -50%,
-      calc(
-        -50% + var(--sy) *
-          min(
-            var(--hh) + 4px + var(--pp-card-h) / 2,
-            var(--mid) * 1cqw - var(--pp-card-h) / 2 - 1px
-          )
-      )
-    );
-  }
-
   .pp-seat-root {
     container-type: inline-size;
-  }
-
-
-  @media (min-width: 640px) {
-    .pp-seat-card {
-      --pp-card-w: calc(30px * var(--pp-card-scale, 1));
-    }
   }
 
   .pp-card-in {
