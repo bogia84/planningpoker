@@ -212,6 +212,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
               <MemberList
                 members={state.members}
                 phase={state.round?.phase}
+                roundNumber={state.round?.roundNumber}
                 submittedFactorIds={state.round?.submittedFactorMemberIds}
                 submittedPointIds={state.round?.submittedPointMemberIds}
                 results={state.round?.results}

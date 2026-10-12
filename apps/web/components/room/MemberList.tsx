@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import type { Member, RevealedResult, RoundPhase } from "@planningpoker/shared";
 import { Avatar } from "@/components/avatar/Avatar";
 import { HostChipBadge } from "@/components/room/HostChipBadge";
-import { HostPlayedCard } from "@/components/room/HostPlayedCard";
+import { SeatCard, SeatCardSlot } from "@/components/room/SeatCard";
 
 const TABLE_QUOTES = [
   "ROUND OF THE KNIGHTS",
@@ -29,6 +29,7 @@ function pickTableQuote(): string {
 export function MemberList({
   members,
   phase,
+  roundNumber,
   submittedFactorIds,
   submittedPointIds,
   results,
@@ -41,6 +42,8 @@ export function MemberList({
 }: {
   members: Member[];
   phase?: RoundPhase;
+  /** Keys the cards so nothing carries over into a new round. */
+  roundNumber?: number;
   submittedFactorIds?: string[];
   submittedPointIds?: string[];
   results?: RevealedResult[] | null;
@@ -57,22 +60,15 @@ export function MemberList({
 }) {
   const seatCount = Math.max(members.length, 1);
   const tableQuote = useMemo(() => pickTableQuote(), []);
-  const host = members.find((m) => m.isHost);
-  const hostPlayedPoint =
-    phase === "revealed" ? results?.find((r) => r.memberId === host?.id)?.point : undefined;
 
   return (
-    <div className="relative mx-auto aspect-3/2 w-full max-w-3xl">
+    <div className="pp-seat-root relative mx-auto aspect-3/2 w-full max-w-3xl">
       <div className="pixel-card pp-board-outer absolute inset-x-[16%] inset-y-[24.5%] select-none overflow-hidden p-[1.5%]">
         <div className="pp-board-frame h-full w-full rounded border-4 border-(--pp-ink) p-[5%]">
           <div className="pp-board-surface flex h-full w-full flex-col items-center justify-center rounded border-2 border-(--pp-ink)/40 px-[8%]">
-            {hostPlayedPoint !== undefined ? (
-              <HostPlayedCard key={`${host?.id}-${hostPlayedPoint}`} point={hostPlayedPoint} />
-            ) : (
-              <span className="pp-board-quote pixel-heading pointer-events-none text-center text-base leading-tight tracking-wide sm:text-lg">
-                {tableQuote}
-              </span>
-            )}
+            <span className="pp-board-quote pixel-heading pointer-events-none text-center text-base leading-tight tracking-wide sm:text-lg">
+              {tableQuote}
+            </span>
           </div>
         </div>
       </div>
@@ -94,6 +90,15 @@ export function MemberList({
         const nudgeText = nudgeTexts?.[m.id] ?? "VOTE ALREADY!";
         const revealedPoint =
           phase === "revealed" ? results?.find((r) => r.memberId === m.id)?.point : undefined;
+        const hasCard = phase === "revealed" ? revealedPoint !== undefined : roundOpen && pointDone;
+        // A lower-half top/bottom seat puts its card where its bubble sits, so it skips the slot.
+        const slotUnderBubble = isThinking && Math.abs(Math.cos(angle)) < 0.45 && Math.sin(angle) > 0;
+        const showSlot = !hasCard && Boolean(phase) && m.connected && !slotUnderBubble;
+        const hasControls = Boolean(viewerIsHost && m.id !== selfMemberId);
+        const cardScale = seatCount > 10 ? 0.8 : seatCount > 7 ? 0.9 : 1;
+        const scoringRow = phase === "factors" && !factorsDone && m.connected;
+        const bubbleRem = isNudged ? 4.5 : isThinking ? 1.5 : 0;
+        const blockRem = 4.125 + (hasControls ? 2 : 0) + (scoringRow ? 1.25 : 0);
 
         return (
           <div
@@ -103,23 +108,38 @@ export function MemberList({
             }`}
             style={{ left: `${left}%`, top: `${top}%` }}
           >
+            {hasCard ? (
+              <SeatCard
+                key={`${roundNumber ?? 0}-${m.id}`}
+                name={m.name}
+                point={revealedPoint}
+                angle={angle}
+                topPct={top}
+                blockRem={blockRem}
+                bubbleRem={bubbleRem}
+                scale={cardScale}
+                flipDelayMs={Math.min(i * 60, 600)}
+              />
+            ) : showSlot ? (
+              <SeatCardSlot
+                angle={angle}
+                topPct={top}
+                blockRem={blockRem}
+                bubbleRem={bubbleRem}
+                scale={cardScale}
+              />
+            ) : null}
             <div className="relative">
-              {revealedPoint !== undefined ? (
-                <span
-                  className="pixel-card absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full min-w-[1.75rem] whitespace-nowrap bg-(--pp-primary) px-2 py-1 text-center text-lg font-bold leading-none text-white"
-                  title="Revealed point"
-                >
-                  {revealedPoint}
-                </span>
-              ) : null}
               {isThinking && !isNudged ? (
-                <span
-                  className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full animate-bounce text-lg leading-none"
-                  title="Still deciding"
-                  aria-label="Thinking"
-                >
-                  💭
-                </span>
+                <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full">
+                  <span
+                    className="block animate-bounce text-lg leading-none"
+                    title="Still deciding"
+                    aria-label="Thinking"
+                  >
+                    💭
+                  </span>
+                </div>
               ) : null}
               {isNudged ? (
                 <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full flex flex-col items-center gap-0.5">
@@ -130,14 +150,6 @@ export function MemberList({
                     <span className="inline-block rotate-[-35deg]">👊</span>
                   </span>
                 </div>
-              ) : null}
-              {roundOpen && pointDone ? (
-                <span
-                  className="absolute -top-1 -right-1 rounded-full bg-(--pp-success) px-1 text-xs leading-tight text-white"
-                  title="Voted"
-                >
-                  ✓
-                </span>
               ) : null}
               <Avatar avatarId={m.avatarId} size={36} />
               {m.isHost ? <HostChipBadge /> : null}
