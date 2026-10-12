@@ -17,8 +17,13 @@ Run these in strict order. Each step depends on the previous one's output, so ca
 
 3. **Dev-Agent.** Call `Agent({ subagent_type: "dev-agent", ... })` with the full BA-Agent spec verbatim, not a paraphrase. Expect back: files changed, a summary of the implementation approach, and any deviations from the spec (and why).
 
-4. **QA-Agent.** Call `Agent({ subagent_type: "qa-agent", ... })` with the BA-Agent acceptance criteria and the Dev-Agent change summary. Expect back a pass/fail signal with concrete evidence (what was checked, what broke).
-   - On fail: send the QA findings back to Dev-Agent. Prefer `SendMessage` to the *same* Dev-Agent instance (by name) so it keeps implementation context, rather than spawning a fresh Dev-Agent that has to rediscover its own code. Re-run QA-Agent after the fix.
+4. **QA-Agent.** Call `Agent({ subagent_type: "qa-agent", ... })` with a **scoped test list**, not the whole spec:
+   - The numbered acceptance criteria for this requirement only (typically 2–6). Merge or drop ones that restate each other, and leave out non-goals and background.
+   - Tag a criterion `[runtime]` only if it can't be verified from code (rendered layout/overlap, cross-client sync). Untagged criteria get a code-only check.
+   - The changed-files list from Dev-Agent, and whether Dev-Agent's build passed.
+
+   Expect back a pass/fail per criterion.
+   - On fail: send the QA findings back to Dev-Agent. On re-runs, give QA only the criteria that failed plus any whose files changed in the fix. Prefer `SendMessage` to the *same* Dev-Agent instance (by name) so it keeps implementation context, rather than spawning a fresh Dev-Agent that has to rediscover its own code. Re-run QA-Agent after the fix.
    - Cap this loop at 3 rounds. If still failing, stop and report the blocker to the user instead of looping forever.
 
 5. **Deploy-Agent.** Only once QA-Agent signals pass. Call `Agent({ subagent_type: "deploy-agent", ... })` with the Dev-Agent change summary and QA-Agent's pass evidence. Deploy-Agent pushes to GitHub and deploys to Cloudflare — per this project's risk rules that is a confirm-first action, so Deploy-Agent will ask the user before pushing/deploying unless you tell it the user already pre-authorized this specific run. Do not pre-authorize on the user's behalf unless they explicitly said "ship it without asking" or equivalent for this task.
