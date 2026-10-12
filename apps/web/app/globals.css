@@ -296,6 +296,7 @@
        board itself at narrow widths — not just with --pp-card-scale (seatCount). */
     --pp-card-w: calc(3.75cqw * var(--pp-card-scale, 1));
     --pp-card-h: calc(var(--pp-card-w) * 1.4);
+    display: none;
     position: absolute;
     z-index: 1;
     width: var(--pp-card-w);
@@ -306,8 +307,27 @@
     container-type: inline-size;
   }
 
+  /* Named so the visibility query below targets pp-seat-root specifically, skipping
+     the nested (unnamed) container that .pp-seat-card establishes for its own cqw
+     font-sizing. A container query (not a viewport media query) is required here:
+     the board's own rendered width can be narrower than the viewport (e.g. in a
+     test harness that constrains it via a wrapper div), and the inner-ring layout
+     only ever needs to react to the board's own width. */
   .pp-seat-root {
-    container-type: inline-size;
+    container: pp-table / inline-size;
+  }
+
+  /* Below 768px the inner-ring cards are hidden in favor of the simpler per-seat
+     badge/checkmark fallback (rendered unconditionally in MemberList, gated by the
+     complementary rule below); above 768px that fallback hides and the ring shows. */
+  @container pp-table (min-width: 768px) {
+    .pp-seat-card {
+      display: block;
+    }
+
+    .pp-seat-fallback {
+      display: none;
+    }
   }
 
   .pp-card-in {

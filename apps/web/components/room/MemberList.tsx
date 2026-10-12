@@ -188,6 +188,25 @@ export function MemberList({
                 ) : null}
                 <Avatar avatarId={m.avatarId} size={36} />
                 {m.isHost ? <HostChipBadge /> : null}
+                {/* Below 768px (board's own container width, not the viewport — see
+                    the pp-table container query in globals.css) the inner-ring cards
+                    are hidden and this per-seat badge/checkmark fallback takes over. */}
+                {revealedPoint !== undefined ? (
+                  <span
+                    className="pp-seat-fallback pixel-card absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full min-w-[1.75rem] whitespace-nowrap bg-(--pp-primary) px-2 py-1 text-center text-lg font-bold leading-none text-white"
+                    title="Revealed point"
+                  >
+                    {revealedPoint}
+                  </span>
+                ) : null}
+                {roundOpen && pointDone ? (
+                  <span
+                    className="pp-seat-fallback absolute -top-1 -right-1 rounded-full bg-(--pp-success) px-1 text-xs leading-tight text-white"
+                    title="Voted"
+                  >
+                    ✓
+                  </span>
+                ) : null}
               </div>
               <span className="pixel-card max-w-[7rem] truncate bg-(--pp-panel) px-1.5 py-0.5 text-sm font-bold">
                 {m.name}
