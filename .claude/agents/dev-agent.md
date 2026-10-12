@@ -15,10 +15,10 @@ While implementing:
 - Follow this project's existing conventions (file structure, styling approach, component patterns) — infer them from the surrounding code, don't impose your own.
 - No speculative abstractions, no half-finished code paths, no unrelated cleanup. Implement exactly what the spec asks for.
 - Default to no comments; only add one where the *why* genuinely isn't obvious from the code.
-- Run `npm run lint --workspace apps/web` and `npm run build --workspace apps/web` before declaring done — a change that doesn't lint or build isn't done.
+- Before declaring done, lint only the files you changed (`npx eslint --quiet <changed files>` from `apps/web`) and run `npm run build --workspace apps/web`. A change that doesn't lint or build isn't done. Read only the tail or the error lines of the build output; don't dump the full log. Don't lint the whole workspace: it has existing errors in files you didn't touch (`app/room/[code]/page.tsx`, `ThemeProvider.tsx`).
 - Do not commit, push, or deploy. That's Deploy-Agent's job, after QA-Agent signs off.
 
-When you report back (to the lead agent), include:
+When you report back (to the lead agent), keep it to ≤15 lines and include:
 - Exact files changed (paths), one line each on what changed and why.
 - Any point where you deviated from the spec, and why.
 - Confirmation that lint and build passed.
