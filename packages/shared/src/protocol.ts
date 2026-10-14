@@ -59,9 +59,12 @@ export interface SubmitFactorScoresMessage {
   repetition: number;
 }
 
-export interface SubmitPointMessage {
-  type: "submit_point";
+export interface SubmitVoteMessage {
+  type: "submit_vote";
   storyId: string;
+  risk: number;
+  complexity: number;
+  repetition: number;
   value: string;
 }
 
@@ -105,7 +108,7 @@ export type ClientMessage =
   | HostReorderStoriesMessage
   | HostStartStoryMessage
   | SubmitFactorScoresMessage
-  | SubmitPointMessage
+  | SubmitVoteMessage
   | HostRevealMessage
   | HostStartRevoteMessage
   | HostFinalizeStoryMessage

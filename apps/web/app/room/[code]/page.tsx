@@ -112,8 +112,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   function selectPoint(value: string) {
     if (!activeStory) return;
     setVotePoint(value);
-    send({ type: "submit_factor_scores", storyId: activeStory.id, ...voteScores });
-    send({ type: "submit_point", storyId: activeStory.id, value });
+    send({ type: "submit_vote", storyId: activeStory.id, ...voteScores, value });
   }
 
   function handleRevealClick() {

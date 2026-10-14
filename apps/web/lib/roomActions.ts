@@ -160,15 +160,22 @@ export function applyAction(record: RoomRecord, memberId: string, message: RoomA
       return { ...record, round: { ...record.round, factorScores } };
     }
 
-    case "submit_point": {
+    case "submit_vote": {
       if (!record.round || record.activeStoryId !== message.storyId || record.round.phase !== "factors") {
         return record;
+      }
+      if (!isValidScore(message.risk) || !isValidScore(message.complexity) || !isValidScore(message.repetition)) {
+        throw new ActionError("invalid_score", "Scores must be integers 1-10");
       }
       if (!record.config.scaleValues.includes(message.value)) {
         throw new ActionError("invalid_point", "Point not in room scale");
       }
+      const factorScores = {
+        ...record.round.factorScores,
+        [memberId]: { risk: message.risk, complexity: message.complexity, repetition: message.repetition },
+      };
       const pointVotes = { ...record.round.pointVotes, [memberId]: message.value };
-      return { ...record, round: { ...record.round, pointVotes } };
+      return { ...record, round: { ...record.round, factorScores, pointVotes } };
     }
 
     case "host_reveal": {
